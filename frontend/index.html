@@ -16,7 +16,9 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="ble.css?v=8" />
   <link rel="stylesheet" href="sdr.css?v=3" />
-  <link rel="stylesheet" href="badges.css?v=1" />
+  <link rel="stylesheet" href="badges.css?v=2" />
+  <link rel="stylesheet" href="radar-styles.css?v=1" />
+  <link rel="stylesheet" href="features.css?v=1" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
@@ -91,6 +93,8 @@
             <button id="radarToggleBtn" class="button btn-sm" onclick="toggleRadarView()" title="Radar view">📡</button>
             <button id="proxSoundBtn" class="button btn-sm" onclick="toggleProximitySound()" title="Proximity sound" style="display:none">🔊</button>
             <button class="button btn-sm" onclick="exportDevicesCSV()" title="Export to CSV">📥</button>
+            <button class="button btn-sm" onclick="exportScanReport()" title="Export HTML report">📊</button>
+            <button id="soundscapeBtn" class="button btn-sm" onclick="toggleSoundscape()" title="Sound signatures">🎵</button>
             <button class="button btn-sm" onclick="simulateDevices()" title="Demo mode">🎲</button>
           </div>
         </div>
@@ -114,6 +118,16 @@
           <div class="ble-empty" data-i18n="noDevices">No devices found. Press Scan to start.</div>
         </div>
         <div id="radarView" class="ble-radar-view" style="display:none">
+          <div class="radar-style-bar">
+            <button class="radar-style-btn active" data-style="military" onclick="setRadarStyle('military')">Military</button>
+            <button class="radar-style-btn" data-style="tactical" onclick="setRadarStyle('tactical')">Tactical</button>
+            <button class="radar-style-btn" data-style="thermal" onclick="setRadarStyle('thermal')">Thermal</button>
+            <button class="radar-style-btn" data-style="sonar" onclick="setRadarStyle('sonar')">Sonar</button>
+            <button class="radar-style-btn" data-style="constellation" onclick="setRadarStyle('constellation')">Stars</button>
+          </div>
+          <div id="soundViz" class="sound-visualizer" style="display:none;justify-content:center;padding:4px 0">
+            <div class="sound-bar"></div><div class="sound-bar"></div><div class="sound-bar"></div><div class="sound-bar"></div><div class="sound-bar"></div>
+          </div>
           <div class="ble-radar-container">
             <div class="ble-radar-circle">
               <div class="ble-radar-ring ble-ring-1"></div>
@@ -255,7 +269,71 @@
       </div>
     </details>
 
-    <!-- ══════ CARD 6 — SDR SPECTRUM ══════ -->
+    <!-- ══════ CARD 6 — COMMAND CENTER ══════ -->
+    <details class="collapsible section-command">
+      <summary><span class="icon">🎯</span> Command Center <span id="threatCountBadge" class="threat-count-badge green" style="display:none;margin-left:6px">0</span></summary>
+      <div class="card section-command">
+
+        <!-- Scan Analytics -->
+        <div style="padding:8px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#38bdf8; margin-bottom:8px; padding:0 4px;">📊 Scan Analytics</div>
+          <div class="analytics-row">
+            <div class="analytics-card"><div id="analyticsDevPerMin" class="analytics-value">0</div><div class="analytics-label">Devices/min</div></div>
+            <div class="analytics-card"><div id="analyticsSession" class="analytics-value">0m</div><div class="analytics-label">Session</div></div>
+            <div class="analytics-card"><div id="analyticsPeak" class="analytics-value">0</div><div class="analytics-label">Peak</div></div>
+            <div class="analytics-card"><div id="analyticsTotalScans" class="analytics-value">0</div><div class="analytics-label">Scans</div></div>
+          </div>
+          <div class="analytics-chart-wrap">
+            <div class="vendor-pie-wrap"><canvas id="vendorPieCanvas"></canvas></div>
+            <div class="rssi-histogram-wrap"><canvas id="rssiHistCanvas"></canvas></div>
+          </div>
+        </div>
+
+        <!-- BLE Leaderboard -->
+        <div style="padding:12px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#38bdf8; margin-bottom:8px; padding:0 4px;">🏆 BLE Leaderboard</div>
+          <table class="leaderboard-table">
+            <thead><tr><th>#</th><th>Device</th><th>Visits</th><th>Best RSSI</th><th>DNA</th></tr></thead>
+            <tbody id="leaderboardBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Mission Mode -->
+        <div style="padding:12px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#38bdf8; margin-bottom:8px; padding:0 4px;">🎯 Missions</div>
+          <div class="xp-bar-wrap">
+            <span id="xpLevel" class="xp-level">Lv.1 BLE Rookie</span>
+            <div class="xp-bar"><div id="xpBarFill" class="xp-bar-fill" style="width:0%"></div></div>
+            <span id="xpText" class="xp-text">0 / 50 XP</span>
+          </div>
+          <div id="missionGrid" class="mission-grid"></div>
+        </div>
+
+        <!-- Signal Heatmap -->
+        <div style="padding:12px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#38bdf8; margin-bottom:8px; padding:0 4px;">🌡️ Signal Heatmap Timeline</div>
+          <div class="heatmap-wrap"><canvas id="heatmapCanvas"></canvas></div>
+          <div class="heatmap-legend"><span>Weak (-100)</span><span>Strong (-30)</span></div>
+        </div>
+
+        <!-- Co-Location Graph -->
+        <div style="padding:12px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#38bdf8; margin-bottom:8px; padding:0 4px;">🔗 Co-Location Graph</div>
+          <div class="coloc-wrap"><canvas id="colocCanvas"></canvas></div>
+        </div>
+
+        <!-- Threat Detector -->
+        <div style="padding:12px 0">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#38bdf8; margin-bottom:8px; padding:0 4px;">🛡️ Threat Detector</div>
+          <div id="threatPanel" class="threat-panel">
+            <div style="text-align:center;padding:12px;color:var(--text-dim);font-size:.7rem">✅ No threats detected — all clear!</div>
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- ══════ CARD 7 — SDR SPECTRUM ══════ -->
     <details class="collapsible section-sdr">
       <summary><span class="icon">📻</span> <span data-i18n="sdrTitle">SDR Spectrum (2.4 GHz)</span></summary>
       <div class="card section-sdr">
@@ -561,8 +639,9 @@
 </div>
 
 <script src="script.js"></script>
-<script src="ble.js?v=6"></script>
+<script src="ble.js?v=7"></script>
 <script src="sdr.js?v=1"></script>
-<script src="badges.js?v=1"></script>
+<script src="badges.js?v=2"></script>
+<script src="features.js?v=1"></script>
 </body>
 </html>

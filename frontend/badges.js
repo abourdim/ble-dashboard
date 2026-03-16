@@ -251,17 +251,22 @@ function _renderTradingCards() {
 
     const el = document.createElement('div');
     el.className = 'trading-card rarity-' + rarity;
+    const nickname = typeof _getNickname === 'function' ? _getNickname(c.addr) : '';
+    el.onclick = () => { if (typeof promptNickname === 'function') promptNickname(c.addr); };
+    el.title = 'Click to set nickname';
     el.innerHTML =
       '<div class="tc-header">' +
         '<span class="tc-icon">' + icon + '</span>' +
-        '<span class="tc-name">' + _esc(c.name) + '</span>' +
+        '<span class="tc-name">' + _esc(nickname || c.name) + '</span>' +
         '<span class="tc-rarity ' + rarity + '">' + rarity + '</span>' +
       '</div>' +
+      (nickname ? '<div style="font-size:.55rem;color:#38bdf8;font-weight:600">aka ' + _esc(c.name) + '</div>' : '') +
       '<div class="tc-vendor">' + _esc(c.vendor || 'Unknown vendor') + '</div>' +
       '<div class="tc-stats">' +
         '<div><span class="tc-stat-label">Best Signal</span><span class="tc-stat-value">' + c.bestRssi + ' dBm</span></div>' +
         '<div><span class="tc-stat-label">Visits</span><span class="tc-stat-value">' + c.visits + '</span></div>' +
       '</div>' +
+      '<div class="tc-dna">' + (typeof generateDeviceDNA === 'function' ? generateDeviceDNA(c.addr) : '') + '</div>' +
       '<div class="tc-first-seen">First seen: ' + dateStr + '</div>' +
       '<span class="tc-count">#' + Object.keys(_loadCards()).indexOf(c.addr) + '</span>';
     container.appendChild(el);

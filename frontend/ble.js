@@ -1023,7 +1023,7 @@ function renderDeviceList(devices) {
     'Apple': '#a1a1aa', 'Samsung': '#3b82f6', 'Microsoft': '#22d3ee',
     'Google': '#f97316', 'BBC micro:bit': '#fbbf24', 'Nordic Semiconductor': '#38bdf8',
     'Xiaomi': '#fb923c', 'Huawei': '#ef4444', 'Amazon': '#f59e0b',
-    'Espressif': '#a78bfa', 'Intel': '#60a5fa', 'Qualcomm': '#e879f9',
+    'Espressif': '#2dd4bf', 'Intel': '#60a5fa', 'Qualcomm': '#0ea5e9',
     'Texas Instruments': '#34d399', 'Garmin': '#4ade80', 'Unknown': '#6b7280',
   };
 
@@ -1158,7 +1158,7 @@ function renderRadarBlips(devices) {
     'Apple': '#a1a1aa', 'Samsung': '#3b82f6', 'Microsoft': '#22d3ee',
     'Google': '#f97316', 'BBC micro:bit': '#fbbf24', 'Nordic Semiconductor': '#38bdf8',
     'Xiaomi': '#fb923c', 'Huawei': '#ef4444', 'Amazon': '#f59e0b',
-    'Espressif': '#a78bfa', 'Intel': '#60a5fa', 'Qualcomm': '#e879f9',
+    'Espressif': '#2dd4bf', 'Intel': '#60a5fa', 'Qualcomm': '#0ea5e9',
     'Texas Instruments': '#34d399', 'Garmin': '#4ade80', 'Unknown': '#6b7280',
   };
 

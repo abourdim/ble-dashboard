@@ -1,0 +1,266 @@
+/* ═══════════════════════════════════════════
+   radar-styles.css — 5 Radar Visual Themes
+   ═══════════════════════════════════════════ */
+
+/* ── Style selector ── */
+.radar-style-bar {
+  display:flex; gap:4px; justify-content:center; padding:6px 0;
+}
+.radar-style-btn {
+  font-size:.6rem; padding:3px 8px; border-radius:4px; cursor:pointer;
+  border:1px solid var(--border,rgba(255,255,255,.1));
+  background:rgba(255,255,255,.04); color:var(--text-dim,#7a8aaa);
+  font-family:'Orbitron',monospace; font-weight:600; text-transform:uppercase;
+  letter-spacing:.04em; transition:all .2s;
+}
+.radar-style-btn:hover { border-color:var(--accent,#00aaff); color:var(--text,#e0e8ff); }
+.radar-style-btn.active {
+  background:var(--accent,#00aaff); color:var(--bg,#08091a);
+  border-color:var(--accent,#00aaff);
+}
+
+/* ═══════════════════════════════════
+   1. MILITARY (Classic green phosphor)
+   ═══════════════════════════════════ */
+.radar-military .ble-radar-circle {
+  background: radial-gradient(circle, rgba(34,197,94,.06) 0%, rgba(0,20,0,.15) 70%);
+  border-color: rgba(34,197,94,.2);
+}
+.radar-military .ble-radar-ring {
+  border-color: rgba(34,197,94,.15);
+  border-style: dashed;
+}
+.radar-military .ble-radar-sweep {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(34,197,94,.12) 20deg,
+    rgba(34,197,94,.03) 40deg,
+    transparent 60deg
+  );
+}
+.radar-military .ble-radar-circle::before,
+.radar-military .ble-radar-circle::after {
+  background: rgba(34,197,94,.1);
+}
+.radar-military .ble-radar-label { color: rgba(34,197,94,.4); }
+.radar-military .ble-radar-center { filter: drop-shadow(0 0 8px rgba(34,197,94,.5)); }
+.radar-military .ble-radar-blip-name { color: #86efac; text-shadow: 0 0 6px rgba(34,197,94,.4); }
+.radar-military .ble-radar-blip-rssi { color: rgba(34,197,94,.5); }
+/* Phosphor scanline effect */
+.radar-military .ble-radar-circle::before {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(34,197,94,.02) 2px,
+    rgba(34,197,94,.02) 4px
+  ) !important;
+  top:0; bottom:0; left:0; right:0; width:auto;
+  height:auto; z-index:1; pointer-events:none;
+}
+
+/* ═══════════════════════════════════
+   2. TACTICAL HUD (Steel-blue, compass)
+   ═══════════════════════════════════ */
+.radar-tactical .ble-radar-circle {
+  background: radial-gradient(circle, rgba(56,189,248,.04) 0%, rgba(8,12,30,.2) 70%);
+  border: 2px solid rgba(56,189,248,.25);
+}
+.radar-tactical .ble-radar-ring {
+  border-color: rgba(56,189,248,.12);
+  border-style: solid;
+  border-width: 1px;
+}
+.radar-tactical .ble-radar-sweep {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(56,189,248,.1) 15deg,
+    rgba(56,189,248,.02) 30deg,
+    transparent 45deg
+  );
+  animation-duration: 2s;
+}
+.radar-tactical .ble-radar-circle::before,
+.radar-tactical .ble-radar-circle::after {
+  background: rgba(56,189,248,.08);
+}
+.radar-tactical .ble-radar-label { color: rgba(56,189,248,.5); font-weight:700; }
+.radar-tactical .ble-radar-blip-name { color: #bae6fd; }
+.radar-tactical .ble-radar-blip-rssi { color: rgba(56,189,248,.6); }
+/* Compass marks */
+.radar-tactical::after {
+  content:''; position:absolute; top:0; left:0; right:0; bottom:0;
+  pointer-events:none; z-index:1;
+}
+.radar-tactical .compass-n,
+.radar-tactical .compass-s,
+.radar-tactical .compass-e,
+.radar-tactical .compass-w {
+  position:absolute; font-family:'Orbitron',monospace;
+  font-size:.6rem; font-weight:700; color:rgba(56,189,248,.6);
+  z-index:4; pointer-events:none;
+}
+.radar-tactical .compass-n { top:4%; left:50%; transform:translateX(-50%); }
+.radar-tactical .compass-s { bottom:4%; left:50%; transform:translateX(-50%); }
+.radar-tactical .compass-e { right:4%; top:50%; transform:translateY(-50%); }
+.radar-tactical .compass-w { left:4%; top:50%; transform:translateY(-50%); }
+/* Angular corner brackets */
+.radar-tactical .ble-radar-circle {
+  clip-path: none;
+}
+.radar-tactical .hud-corner {
+  position:absolute; width:20px; height:20px;
+  border-color:rgba(56,189,248,.4); z-index:4; pointer-events:none;
+}
+.radar-tactical .hud-corner.tl { top:6px; left:6px; border-top:2px solid; border-left:2px solid; }
+.radar-tactical .hud-corner.tr { top:6px; right:6px; border-top:2px solid; border-right:2px solid; }
+.radar-tactical .hud-corner.bl { bottom:6px; left:6px; border-bottom:2px solid; border-left:2px solid; }
+.radar-tactical .hud-corner.br { bottom:6px; right:6px; border-bottom:2px solid; border-right:2px solid; }
+/* Threat level indicator */
+.radar-tactical .hud-threat {
+  position:absolute; top:8px; right:30px; z-index:5;
+  font-family:'Orbitron',monospace; font-size:.5rem; font-weight:700;
+  padding:2px 6px; border-radius:2px; pointer-events:none;
+}
+.radar-tactical .hud-threat.green { color:#22c55e; border:1px solid rgba(34,197,94,.3); }
+.radar-tactical .hud-threat.yellow { color:#eab308; border:1px solid rgba(234,179,8,.3); }
+.radar-tactical .hud-threat.red { color:#ef4444; border:1px solid rgba(239,68,68,.3); animation:hudFlash 1s infinite; }
+@keyframes hudFlash { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* ═══════════════════════════════════
+   3. THERMAL / INFRARED
+   ═══════════════════════════════════ */
+.radar-thermal .ble-radar-circle {
+  background: radial-gradient(circle, rgba(30,10,60,.3) 0%, rgba(0,0,20,.5) 70%);
+  border-color: rgba(139,92,246,.2);
+}
+.radar-thermal .ble-radar-ring {
+  border-color: rgba(100,50,150,.12);
+  border-style: dotted;
+}
+.radar-thermal .ble-radar-sweep {
+  display: none !important;
+}
+.radar-thermal .ble-radar-circle::before,
+.radar-thermal .ble-radar-circle::after {
+  background: rgba(139,92,246,.06);
+}
+.radar-thermal .ble-radar-label { color: rgba(200,150,255,.35); }
+.radar-thermal .ble-radar-blip-name { color: #fde68a; }
+.radar-thermal .ble-radar-blip-rssi { color: rgba(251,191,36,.5); }
+/* Thermal blip glow */
+.radar-thermal .ble-radar-dot {
+  box-shadow: 0 0 12px 4px currentColor, 0 0 24px 8px currentColor !important;
+  border: none !important;
+  filter: blur(1px);
+}
+/* Noise texture overlay */
+.radar-thermal .ble-radar-circle::before {
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E") !important;
+  top:0; bottom:0; left:0; right:0; width:auto; height:auto;
+  z-index:1; pointer-events:none; border-radius:50%;
+}
+
+/* ═══════════════════════════════════
+   4. SONAR PULSE
+   ═══════════════════════════════════ */
+.radar-sonar .ble-radar-circle {
+  background: radial-gradient(circle, rgba(45,212,191,.04) 0%, rgba(0,15,30,.3) 70%);
+  border-color: rgba(45,212,191,.2);
+}
+.radar-sonar .ble-radar-ring {
+  border-color: rgba(45,212,191,.1);
+  border-style: solid;
+}
+.radar-sonar .ble-radar-sweep {
+  display: none !important;
+}
+.radar-sonar .ble-radar-circle::before,
+.radar-sonar .ble-radar-circle::after {
+  background: rgba(45,212,191,.06);
+}
+.radar-sonar .ble-radar-label { color: rgba(45,212,191,.35); }
+.radar-sonar .ble-radar-blip-name { color: #99f6e4; }
+.radar-sonar .ble-radar-blip-rssi { color: rgba(45,212,191,.5); }
+/* Sonar pulse rings radiating from center */
+.radar-sonar .sonar-pulse {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:0; height:0; border-radius:50%;
+  border:2px solid rgba(45,212,191,.3);
+  animation: sonarPulse 3s ease-out infinite;
+  pointer-events:none; z-index:1;
+}
+.radar-sonar .sonar-pulse:nth-child(2) { animation-delay: 1s; }
+.radar-sonar .sonar-pulse:nth-child(3) { animation-delay: 2s; }
+@keyframes sonarPulse {
+  0%   { width:0; height:0; opacity:.8; border-width:3px; }
+  100% { width:100%; height:100%; opacity:0; border-width:1px; }
+}
+/* Ripple effect on blips */
+.radar-sonar .ble-radar-dot {
+  animation: sonarBlipRipple 2s ease-in-out infinite !important;
+}
+@keyframes sonarBlipRipple {
+  0%,100% { box-shadow: 0 0 4px currentColor; }
+  50%     { box-shadow: 0 0 4px currentColor, 0 0 12px currentColor, 0 0 20px rgba(45,212,191,.2); }
+}
+
+/* ═══════════════════════════════════
+   5. CONSTELLATION MAP
+   ═══════════════════════════════════ */
+.radar-constellation .ble-radar-circle {
+  background: radial-gradient(circle, rgba(30,41,59,.3) 0%, rgba(2,6,23,.6) 70%);
+  border-color: rgba(148,163,184,.15);
+}
+.radar-constellation .ble-radar-ring {
+  border: none;
+}
+.radar-constellation .ble-radar-sweep {
+  display: none !important;
+}
+.radar-constellation .ble-radar-circle::before,
+.radar-constellation .ble-radar-circle::after {
+  display: none;
+}
+.radar-constellation .ble-radar-label { display: none; }
+.radar-constellation .ble-radar-blip-name { color: #e2e8f0; font-size:.55rem; }
+.radar-constellation .ble-radar-blip-rssi { color: rgba(148,163,184,.4); font-size:.45rem; }
+/* Star-shaped blips */
+.radar-constellation .ble-radar-dot {
+  border-radius: 0 !important;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation: starTwinkle 3s ease-in-out infinite !important;
+  border: none !important;
+  width: 12px !important; height: 12px !important;
+}
+@keyframes starTwinkle {
+  0%,100% { opacity:.6; filter:brightness(1); }
+  50%     { opacity:1; filter:brightness(1.5); }
+}
+/* Star field background dots */
+.radar-constellation .star-field {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; z-index:0; border-radius:50%; overflow:hidden;
+}
+.radar-constellation .star-field .micro-star {
+  position:absolute; width:1px; height:1px;
+  background:#fff; border-radius:50%;
+  animation: starTwinkle 4s ease-in-out infinite;
+}
+/* Constellation lines (drawn by JS via SVG overlay) */
+.radar-constellation .constellation-lines {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; z-index:2;
+}
+.radar-constellation .constellation-lines line {
+  stroke: rgba(148,163,184,.15);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+/* ═══════════════════════════════════
+   SHARED: radar container extras
+   ═══════════════════════════════════ */
+.ble-radar-container { position:relative; }
