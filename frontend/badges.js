@@ -243,7 +243,8 @@ function _renderTradingCards() {
   }
 
   container.innerHTML = '';
-  arr.forEach(c => {
+  const cardKeys = Object.keys(cards);
+  arr.forEach((c, cardIdx) => {
     const rarity = _getRarity(c);
     const icon = _getDeviceIcon(c.name, c.vendor);
     const firstDate = new Date(c.firstSeen);
@@ -268,7 +269,7 @@ function _renderTradingCards() {
       '</div>' +
       '<div class="tc-dna">' + (typeof generateDeviceDNA === 'function' ? generateDeviceDNA(c.addr) : '') + '</div>' +
       '<div class="tc-first-seen">First seen: ' + dateStr + '</div>' +
-      '<span class="tc-count">#' + Object.keys(_loadCards()).indexOf(c.addr) + '</span>';
+      '<span class="tc-count">#' + (cardIdx + 1) + '</span>';
     container.appendChild(el);
   });
 
@@ -328,6 +329,7 @@ function _drawFreqMap() {
   const canvas = document.getElementById('freqMapCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
   const w = canvas.width = canvas.clientWidth * 2;
   const h = canvas.height = canvas.clientHeight * 2;
   ctx.scale(2, 2);

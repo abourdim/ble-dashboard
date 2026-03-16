@@ -190,7 +190,7 @@ function generateDeviceDNA(addr) {
   ];
   let html = '<div class="device-dna">';
   for (let i = 0; i < Math.min(clean.length, 12); i++) {
-    const val = parseInt(clean[i], 16);
+    const val = parseInt(clean[i], 16) || 0;
     const color = colors[val] || '#64748b';
     const height = 40 + (val / 15) * 60;
     html += '<div class="dna-seg" style="background:' + color + ';height:' + height + '%;align-self:center"></div>';
@@ -653,7 +653,7 @@ function _renderRssiHistogram(devices) {
   const labels = ['-100','-90','-80','-70','-60','-50','-40','-30'];
   devices.forEach(d => {
     const rssi = Math.max(-100, Math.min(-30, d.rssi || -100));
-    const idx = Math.min(7, Math.floor((rssi + 100) / 10));
+    const idx = Math.max(0, Math.min(7, Math.floor((rssi + 100) / 10)));
     buckets[idx]++;
   });
 
@@ -702,8 +702,8 @@ function promptNickname(addr) {
   if (name !== null) {
     setNickname(addr, name.trim());
     // Re-render relevant views
-    if (typeof renderDeviceList === 'function' && typeof _lastDevices !== 'undefined') {
-      renderDeviceList();
+    if (typeof renderDeviceList === 'function' && typeof ble !== 'undefined' && ble.lastDevices) {
+      renderDeviceList(ble.lastDevices);
     }
     _renderLeaderboard();
   }
@@ -1051,15 +1051,18 @@ function _renderPacketStorm() {
     const alpha = Math.min(1, p.life / 30);
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-    ctx.fillStyle = p.color + Math.round(alpha * 255).toString(16).padStart(2, '0');
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = p.color;
     ctx.fill();
     // Trail
     ctx.beginPath();
     ctx.moveTo(p.x, p.y);
     ctx.lineTo(p.x - p.vx * 3, p.y - p.vy * 3);
-    ctx.strokeStyle = p.color + Math.round(alpha * 80).toString(16).padStart(2, '0');
+    ctx.globalAlpha = alpha * 0.3;
+    ctx.strokeStyle = p.color;
     ctx.lineWidth = p.size * 0.5;
     ctx.stroke();
+    ctx.globalAlpha = 1;
   }
 
   // Stats overlay

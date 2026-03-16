@@ -894,7 +894,8 @@ function _doScan() {
   wsSend({type:'scan', duration:4, name_filter:nameFilter, rssi_min:rssiMin});
   // Continuous scan — re-scan every 5s until stopped
   _scanTimer = setTimeout(() => {
-    if (document.getElementById('stopScanBtn').style.display !== 'none') _doScan();
+    const stopBtn = document.getElementById('stopScanBtn');
+    if (stopBtn && stopBtn.style.display !== 'none') _doScan();
   }, 5000);
 }
 
