@@ -8,7 +8,7 @@
 /* ═══════════════════════════════════
    RADAR STYLE SWITCHING (5 styles)
    ═══════════════════════════════════ */
-const RADAR_STYLES = ['military','tactical','thermal','sonar','constellation'];
+const RADAR_STYLES = ['military','tactical','thermal','sonar','constellation','matrix','submarine'];
 const RADAR_STYLE_KEY = 'ble-radar-style';
 
 function _getRadarStyle() {
@@ -33,7 +33,9 @@ function setRadarStyle(style) {
 
 function _applyRadarStyleExtras(container, style) {
   // Clean up previous extras
-  container.querySelectorAll('.compass-n,.compass-s,.compass-e,.compass-w,.hud-corner,.hud-threat,.sonar-pulse,.star-field,.constellation-lines').forEach(e => e.remove());
+  container.querySelectorAll('.compass-n,.compass-s,.compass-e,.compass-w,.hud-corner,.hud-threat,.sonar-pulse,.star-field,.constellation-lines,.matrix-rain-overlay,.matrix-readout,.sub-depth,.sub-bubble').forEach(e => e.remove());
+  // Stop matrix rain if switching away
+  if (_matrixRainInterval) { clearInterval(_matrixRainInterval); _matrixRainInterval = null; }
   const circle = container.querySelector('.ble-radar-circle');
   if (!circle) return;
 
@@ -65,6 +67,39 @@ function _applyRadarStyleExtras(container, style) {
       const pulse = document.createElement('div');
       pulse.className = 'sonar-pulse';
       circle.appendChild(pulse);
+    }
+  }
+
+  if (style === 'matrix') {
+    // Matrix rain canvas overlay
+    const rainCanvas = document.createElement('canvas');
+    rainCanvas.className = 'matrix-rain-overlay';
+    rainCanvas.width = 200;
+    rainCanvas.height = 200;
+    circle.appendChild(rainCanvas);
+    _startMatrixRain(rainCanvas);
+    // Digital readout
+    const readout = document.createElement('div');
+    readout.className = 'matrix-readout';
+    readout.id = 'matrixReadout';
+    readout.textContent = 'SYS.ONLINE // SCAN.ACTIVE';
+    circle.appendChild(readout);
+  }
+
+  if (style === 'submarine') {
+    // Depth gauge
+    const depth = document.createElement('div');
+    depth.className = 'sub-depth';
+    depth.textContent = 'DEPTH 2.4GHz';
+    circle.appendChild(depth);
+    // Bubbles
+    for (let i = 0; i < 5; i++) {
+      const bubble = document.createElement('div');
+      bubble.className = 'sub-bubble';
+      bubble.style.left = (15 + Math.random() * 70) + '%';
+      bubble.style.animationDelay = (Math.random() * 4) + 's';
+      bubble.style.animationDuration = (3 + Math.random() * 3) + 's';
+      circle.appendChild(bubble);
     }
   }
 
@@ -874,6 +909,487 @@ ${MISSIONS.map(m => {
 }
 
 /* ═══════════════════════════════════
+   16. MATRIX RAIN (for radar style)
+   ═══════════════════════════════════ */
+let _matrixRainInterval = null;
+function _startMatrixRain(canvas) {
+  if (_matrixRainInterval) clearInterval(_matrixRainInterval);
+  const ctx = canvas.getContext('2d');
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコ0123456789@#$%';
+  const columns = Math.floor(canvas.width / 8);
+  const drops = new Array(columns).fill(0);
+  _matrixRainInterval = setInterval(() => {
+    ctx.fillStyle = 'rgba(0,0,0,.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#00ff41';
+    ctx.font = '8px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const ch = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(ch, i * 8, drops[i] * 8);
+      if (drops[i] * 8 > canvas.height && Math.random() > 0.95) drops[i] = 0;
+      drops[i]++;
+    }
+  }, 80);
+}
+
+/* ═══════════════════════════════════
+   17. DEVICE AUTOPSY
+   ═══════════════════════════════════ */
+function showDeviceAutopsy(device) {
+  const panel = document.getElementById('autopsyPanel');
+  if (!panel || !device) return;
+  const addr = device.address || device.id || '??:??:??:??:??:??';
+  const rssi = device.rssi || -100;
+  const name = device.name || '(unknown)';
+  const vendor = (typeof _deviceVendor === 'function' ? _deviceVendor(device) : null) || device.vendor || 'Unknown';
+
+  // MAC byte analysis
+  const macBytes = addr.split(':');
+  const oui = macBytes.slice(0, 3).join(':').toUpperCase();
+  const isRandom = macBytes.length >= 1 && (parseInt(macBytes[0], 16) & 0x02) !== 0;
+
+  // Signal physics calculation
+  const txPower = -59; // assumed typical BLE TX power
+  const n = 2.0; // path loss exponent
+  const distance = Math.pow(10, (txPower - rssi) / (10 * n));
+
+  // Free Space Path Loss
+  const freq = 2440; // MHz
+  const fspl = 20 * Math.log10(distance) + 20 * Math.log10(freq) + 32.44;
+
+  const byteColors = ['#ef4444','#f97316','#f59e0b','#22c55e','#2dd4bf','#38bdf8'];
+
+  panel.innerHTML =
+    '<div class="autopsy-card">' +
+      '<div class="autopsy-header">' +
+        '<span style="font-size:1.2rem">🔬</span>' +
+        '<span class="autopsy-title">' + _escH(name) + '</span>' +
+      '</div>' +
+      '<div class="autopsy-grid">' +
+        '<div class="autopsy-field"><div class="autopsy-label">MAC Address</div><div class="autopsy-value">' + _escH(addr) + '</div></div>' +
+        '<div class="autopsy-field"><div class="autopsy-label">OUI Prefix</div><div class="autopsy-value">' + oui + '</div></div>' +
+        '<div class="autopsy-field"><div class="autopsy-label">Vendor</div><div class="autopsy-value">' + _escH(vendor) + '</div></div>' +
+        '<div class="autopsy-field"><div class="autopsy-label">MAC Type</div><div class="autopsy-value">' + (isRandom ? '🎲 Random' : '🏭 Public') + '</div></div>' +
+        '<div class="autopsy-field"><div class="autopsy-label">RSSI</div><div class="autopsy-value">' + rssi + ' dBm</div></div>' +
+        '<div class="autopsy-field"><div class="autopsy-label">Est. Distance</div><div class="autopsy-value">' + distance.toFixed(2) + ' m</div></div>' +
+      '</div>' +
+      '<div class="autopsy-mac-bytes">' +
+        macBytes.map((b, i) => '<span class="autopsy-byte" style="color:' + byteColors[i % 6] + ';border-color:' + byteColors[i % 6] + '30">' + b.toUpperCase() + '</span>').join('') +
+      '</div>' +
+      generateDeviceDNA(addr) +
+      '<div class="autopsy-signal-physics">' +
+        '// SIGNAL PHYSICS ANALYSIS\n' +
+        'TX Power (assumed): ' + txPower + ' dBm\n' +
+        'Received (RSSI):    ' + rssi + ' dBm\n' +
+        'Path Loss:          ' + (txPower - rssi) + ' dB\n' +
+        'FSPL @ 2.44GHz:     ' + fspl.toFixed(1) + ' dB\n' +
+        'Est. Distance:      ' + distance.toFixed(2) + ' m\n' +
+        'Formula: d = 10^((TxPow - RSSI) / (10*n))' +
+      '</div>' +
+    '</div>';
+}
+
+/* ═══════════════════════════════════
+   18. PACKET STORM VISUALIZER
+   ═══════════════════════════════════ */
+const _packets = []; // {x, y, vx, vy, life, color, size}
+let _packetAnimFrame = null;
+let _packetCount = 0;
+
+function _addPacketBurst(count) {
+  const canvas = document.getElementById('packetStormCanvas');
+  if (!canvas) return;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  const colors = ['#38bdf8','#22c55e','#f59e0b','#ef4444','#2dd4bf','#0ea5e9'];
+  for (let i = 0; i < count; i++) {
+    _packets.push({
+      x: w / 2 + (Math.random() - 0.5) * 40,
+      y: h / 2,
+      vx: (Math.random() - 0.5) * 4,
+      vy: (Math.random() - 0.5) * 4,
+      life: 60 + Math.random() * 60,
+      maxLife: 120,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: 1.5 + Math.random() * 2
+    });
+  }
+  _packetCount += count;
+}
+
+function _renderPacketStorm() {
+  const canvas = document.getElementById('packetStormCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = 2;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+
+  // Draw origin glow
+  const grad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, 30);
+  grad.addColorStop(0, 'rgba(56,189,248,.15)');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(w/2 - 30, h/2 - 30, 60, 60);
+
+  // Update and draw particles
+  for (let i = _packets.length - 1; i >= 0; i--) {
+    const p = _packets[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life--;
+    if (p.life <= 0 || p.x < 0 || p.x > w || p.y < 0 || p.y > h) {
+      _packets.splice(i, 1);
+      continue;
+    }
+    const alpha = Math.min(1, p.life / 30);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = p.color + Math.round(alpha * 255).toString(16).padStart(2, '0');
+    ctx.fill();
+    // Trail
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    ctx.lineTo(p.x - p.vx * 3, p.y - p.vy * 3);
+    ctx.strokeStyle = p.color + Math.round(alpha * 80).toString(16).padStart(2, '0');
+    ctx.lineWidth = p.size * 0.5;
+    ctx.stroke();
+  }
+
+  // Stats overlay
+  const statsEl = document.getElementById('packetStormStats');
+  if (statsEl) statsEl.textContent = _packetCount + ' pkts | ' + _packets.length + ' active';
+
+  _packetAnimFrame = requestAnimationFrame(_renderPacketStorm);
+}
+
+/* ═══════════════════════════════════
+   19. TIME TRAVEL SCANNER
+   ═══════════════════════════════════ */
+const _timeTravelSnapshots = []; // [{ts, devices:[{name,addr,rssi,vendor}]}]
+const TIMETRAVEL_MAX = 30;
+
+function _addTimeTravelSnapshot(devices) {
+  if (!devices?.length) return;
+  _timeTravelSnapshots.push({
+    ts: Date.now(),
+    devices: devices.slice(0, 20).map(d => ({
+      name: d.name || '?',
+      addr: d.address || d.id || '',
+      rssi: d.rssi || -100,
+      vendor: d.vendor || (typeof _deviceVendor === 'function' ? _deviceVendor(d) : '') || ''
+    }))
+  });
+  if (_timeTravelSnapshots.length > TIMETRAVEL_MAX) _timeTravelSnapshots.shift();
+  // Update slider max
+  const slider = document.getElementById('timeTravelSlider');
+  if (slider) {
+    slider.max = _timeTravelSnapshots.length - 1;
+    slider.value = _timeTravelSnapshots.length - 1;
+  }
+  _renderTimeTravelSnapshot(_timeTravelSnapshots.length - 1);
+}
+
+function onTimeTravelSlide(val) {
+  _renderTimeTravelSnapshot(parseInt(val));
+}
+
+function _renderTimeTravelSnapshot(idx) {
+  const container = document.getElementById('timeTravelView');
+  const timeLabel = document.getElementById('timeTravelTime');
+  if (!container) return;
+
+  if (idx < 0 || idx >= _timeTravelSnapshots.length) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text-dim);font-size:.7rem;padding:8px">No snapshots yet — start scanning</div>';
+    return;
+  }
+
+  const snap = _timeTravelSnapshots[idx];
+  if (timeLabel) timeLabel.textContent = new Date(snap.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+  container.innerHTML = '';
+  snap.devices.forEach(d => {
+    const rssiColor = d.rssi > -50 ? '#22c55e' : d.rssi > -70 ? '#eab308' : '#ef4444';
+    const el = document.createElement('div');
+    el.className = 'timetravel-device';
+    el.innerHTML =
+      '<span>' + _escH(d.name) + '</span>' +
+      '<span class="tt-rssi" style="color:' + rssiColor + '">' + d.rssi + '</span>';
+    el.onclick = () => showDeviceAutopsy({ name: d.name, address: d.addr, rssi: d.rssi, vendor: d.vendor });
+    el.style.cursor = 'pointer';
+    container.appendChild(el);
+  });
+}
+
+/* ═══════════════════════════════════
+   20. DEVICE GRAVEYARD
+   ═══════════════════════════════════ */
+const _graveyard = []; // [{name, addr, lastSeen, rssi, vendor}]
+const _currentAliveAddrs = new Set();
+
+function _updateGraveyard(devices) {
+  const nowAlive = new Set();
+  (devices || []).forEach(d => {
+    const addr = d.address || d.id;
+    if (addr) nowAlive.add(addr);
+  });
+
+  // Devices that were alive but now gone
+  _currentAliveAddrs.forEach(addr => {
+    if (!nowAlive.has(addr) && !_graveyard.some(g => g.addr === addr)) {
+      const cards = typeof _loadCards === 'function' ? _loadCards() : {};
+      const card = cards[addr];
+      _graveyard.push({
+        name: card?.name || addr.substring(0, 8),
+        addr: addr,
+        lastSeen: Date.now(),
+        rssi: card?.bestRssi || -100,
+        vendor: card?.vendor || ''
+      });
+      if (_graveyard.length > 20) _graveyard.shift();
+    }
+  });
+
+  _currentAliveAddrs.clear();
+  nowAlive.forEach(a => _currentAliveAddrs.add(a));
+  _renderGraveyard();
+}
+
+function _renderGraveyard() {
+  const container = document.getElementById('graveyardGrid');
+  if (!container) return;
+
+  if (!_graveyard.length) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text-dim);font-size:.7rem;padding:12px;grid-column:1/-1">No departed devices yet...</div>';
+    return;
+  }
+
+  container.innerHTML = '';
+  _graveyard.slice().reverse().forEach(g => {
+    const ago = Math.round((Date.now() - g.lastSeen) / 60000);
+    const el = document.createElement('div');
+    el.className = 'tombstone';
+    el.innerHTML =
+      '<div class="tombstone-icon">🪦</div>' +
+      '<div class="tombstone-name">' + _escH(g.name) + '</div>' +
+      '<div class="tombstone-date">' + ago + 'm ago</div>' +
+      '<div class="tombstone-rip">Last: ' + g.rssi + ' dBm</div>';
+    container.appendChild(el);
+  });
+}
+
+/* ═══════════════════════════════════
+   21. RF SPECTRUM MINI-WATERFALL
+   ═══════════════════════════════════ */
+const _rfWaterfallData = []; // rows of 40 channel values
+const RF_WATERFALL_ROWS = 50;
+
+function _addRfWaterfallRow(devices) {
+  // Simulate BLE channel activity from device count and RSSI
+  const row = new Array(40).fill(-100);
+  // Advertising channels (37, 38, 39)
+  const devCount = (devices || []).length;
+  [37, 38, 39].forEach(ch => {
+    row[ch] = -90 + Math.min(40, devCount * 3) + Math.random() * 10;
+  });
+  // Data channels — distribute devices across them
+  (devices || []).forEach((d, i) => {
+    const ch = i % 37; // channels 0-36
+    const rssi = d.rssi || -100;
+    row[ch] = Math.max(row[ch], rssi + Math.random() * 5);
+  });
+  _rfWaterfallData.push(row);
+  if (_rfWaterfallData.length > RF_WATERFALL_ROWS) _rfWaterfallData.shift();
+  _renderRfWaterfall();
+}
+
+function _renderRfWaterfall() {
+  const canvas = document.getElementById('rfMiniCanvas');
+  if (!canvas || !_rfWaterfallData.length) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = 2;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+
+  const cellW = w / 40;
+  const cellH = h / RF_WATERFALL_ROWS;
+
+  _rfWaterfallData.forEach((row, rowIdx) => {
+    row.forEach((val, ch) => {
+      const norm = Math.max(0, Math.min(1, (val + 100) / 70));
+      // Color: dark blue → cyan → yellow → red
+      let r, g, b;
+      if (norm < 0.5) {
+        r = 0; g = Math.round(norm * 2 * 200); b = Math.round(180 - norm * 2 * 80);
+      } else {
+        const t = (norm - 0.5) * 2;
+        r = Math.round(t * 255); g = Math.round(200 - t * 130); b = Math.round(100 - t * 100);
+      }
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillRect(ch * cellW, rowIdx * cellH, cellW + 0.5, cellH + 0.5);
+    });
+  });
+
+  // Highlight advertising channels
+  [37, 38, 39].forEach(ch => {
+    ctx.strokeStyle = 'rgba(255,255,255,.15)';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(ch * cellW, 0, cellW, h);
+  });
+}
+
+/* ═══════════════════════════════════
+   22. STEALTH METER
+   ═══════════════════════════════════ */
+function _renderStealthMeter(devices) {
+  const container = document.getElementById('stealthList');
+  if (!container || !devices?.length) return;
+
+  const scored = devices.map(d => {
+    let score = 0;
+    const tactics = [];
+    const addr = d.address || d.id || '';
+    const name = d.name || '';
+    const rssi = d.rssi || -100;
+
+    // No name = stealthy
+    if (!name || name === '(unknown)') { score += 30; tactics.push('No Name'); }
+    // Random MAC
+    if (addr && (parseInt(addr.split(':')[0], 16) & 0x02)) { score += 25; tactics.push('Random MAC'); }
+    // Weak signal (hiding far away)
+    if (rssi < -80) { score += 20; tactics.push('Low Power'); }
+    // No manufacturer data
+    if (!d.adv?.manufacturer_data || !Object.keys(d.adv.manufacturer_data).length) { score += 15; tactics.push('No MFG Data'); }
+    // Minimal advertisement
+    if (!d.adv?.service_uuids?.length) { score += 10; tactics.push('No Services'); }
+
+    return { ...d, stealthScore: Math.min(100, score), tactics };
+  }).sort((a, b) => b.stealthScore - a.stealthScore).slice(0, 10);
+
+  container.innerHTML = '';
+  scored.forEach(d => {
+    const color = d.stealthScore > 70 ? '#ef4444' : d.stealthScore > 40 ? '#eab308' : '#22c55e';
+    const el = document.createElement('div');
+    el.className = 'stealth-row';
+    el.innerHTML =
+      '<span class="stealth-name">' + _escH(d.name || d.address || '?') + '</span>' +
+      '<div class="stealth-bar-wrap"><div class="stealth-bar" style="width:' + d.stealthScore + '%;background:' + color + '"></div></div>' +
+      '<span class="stealth-score" style="color:' + color + '">' + d.stealthScore + '</span>' +
+      '<div class="stealth-tactics">' + d.tactics.map(t => '<span class="stealth-tag">' + t + '</span>').join('') + '</div>';
+    container.appendChild(el);
+  });
+}
+
+/* ═══════════════════════════════════
+   23. TERMINAL HACKER VIEW
+   ═══════════════════════════════════ */
+const _terminalLines = [];
+const TERMINAL_MAX = 100;
+
+function _termLog(type, msg) {
+  const ts = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  _terminalLines.push({ ts, type, msg });
+  if (_terminalLines.length > TERMINAL_MAX) _terminalLines.shift();
+  _renderTerminal();
+}
+
+function _renderTerminal() {
+  const body = document.getElementById('terminalBody');
+  if (!body) return;
+  const wasAtBottom = body.scrollTop + body.clientHeight >= body.scrollHeight - 20;
+
+  body.innerHTML = '';
+  _terminalLines.forEach(l => {
+    const line = document.createElement('div');
+    line.className = 'terminal-line';
+    line.innerHTML =
+      '<span class="t-time">[' + l.ts + ']</span> ' +
+      '<span class="t-type ' + l.type + '">[' + l.type.toUpperCase() + ']</span> ' +
+      l.msg;
+    body.appendChild(line);
+  });
+
+  // Cursor
+  const cursor = document.createElement('div');
+  cursor.className = 'terminal-line';
+  cursor.innerHTML = '<span class="t-time">root@ble</span>:~$ <span class="terminal-cursor"></span>';
+  body.appendChild(cursor);
+
+  if (wasAtBottom) body.scrollTop = body.scrollHeight;
+}
+
+/* ═══════════════════════════════════
+   24. SCAN DIFF MODE
+   ═══════════════════════════════════ */
+let _previousScanDevices = [];
+
+function _renderScanDiff(currentDevices) {
+  const container = document.getElementById('diffView');
+  if (!container) return;
+
+  const prev = new Map(_previousScanDevices.map(d => [d.addr, d]));
+  const curr = new Map((currentDevices || []).map(d => [d.address || d.id, {
+    name: d.name || '?',
+    addr: d.address || d.id || '',
+    rssi: d.rssi || -100
+  }]));
+
+  const added = [];
+  const removed = [];
+  const changed = [];
+  const same = [];
+
+  curr.forEach((d, addr) => {
+    if (!prev.has(addr)) added.push(d);
+    else {
+      const p = prev.get(addr);
+      const rssiDiff = d.rssi - p.rssi;
+      if (Math.abs(rssiDiff) > 5) changed.push({ ...d, rssiDiff });
+      else same.push(d);
+    }
+  });
+  prev.forEach((d, addr) => {
+    if (!curr.has(addr)) removed.push(d);
+  });
+
+  // Update summary
+  const summary = document.getElementById('diffSummary');
+  if (summary) {
+    summary.innerHTML =
+      '<span class="diff-stat added">+' + added.length + ' new</span>' +
+      '<span class="diff-stat removed">-' + removed.length + ' gone</span>' +
+      '<span class="diff-stat changed">~' + changed.length + ' changed</span>' +
+      '<span class="diff-stat same">=' + same.length + ' same</span>';
+  }
+
+  container.innerHTML = '';
+  added.forEach(d => {
+    container.innerHTML += '<div class="diff-item add"><span class="diff-marker">+</span>' + _escH(d.name) + ' <span style="opacity:.5">' + d.rssi + ' dBm</span></div>';
+  });
+  removed.forEach(d => {
+    container.innerHTML += '<div class="diff-item rem"><span class="diff-marker">-</span>' + _escH(d.name) + '</div>';
+  });
+  changed.forEach(d => {
+    const arrow = d.rssiDiff > 0 ? '▲' : '▼';
+    const color = d.rssiDiff > 0 ? '#22c55e' : '#ef4444';
+    container.innerHTML += '<div class="diff-item chg"><span class="diff-marker">~</span>' + _escH(d.name) + ' <span style="color:' + color + '">' + arrow + Math.abs(d.rssiDiff) + 'dB</span></div>';
+  });
+
+  // Save current as previous for next diff
+  _previousScanDevices = Array.from(curr.values());
+}
+
+/* ═══════════════════════════════════
    UTILITY
    ═══════════════════════════════════ */
 function _escH(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
@@ -935,6 +1451,15 @@ function _handleFeatureEvent(msg) {
     _updateAnalytics(devices);
     _analyzeThreats(devices);
     _playSoundSignature(devices);
+    // New features v2
+    _addPacketBurst(devices.length * 2);
+    _addTimeTravelSnapshot(devices);
+    _updateGraveyard(devices);
+    _addRfWaterfallRow(devices);
+    _renderStealthMeter(devices);
+    _renderScanDiff(devices);
+    // Terminal log
+    _termLog('scan', devices.length + ' devices found — ' + devices.map(d => d.name || '?').slice(0,5).join(', ') + (devices.length > 5 ? '...' : ''));
 
     // Mission tracking
     const data = _loadMissions();
@@ -970,10 +1495,17 @@ function _handleFeatureEvent(msg) {
     _saveMissions(data);
   } else if (t === 'read_result') {
     _incMission('read_count');
+    _termLog('conn', 'READ characteristic — ' + (msg.value || '').substring(0, 40));
   } else if (t === 'write_ok') {
     _incMission('write_count');
+    _termLog('conn', 'WRITE ok — ' + (msg.char || ''));
   } else if (t === 'subscribed') {
     _incMission('sub_count');
+    _termLog('conn', 'SUBSCRIBED to notifications — ' + (msg.char || ''));
+  } else if (t === 'connected') {
+    _termLog('conn', 'CONNECTED to ' + (msg.name || msg.device || '?'));
+  } else if (t === 'disconnected') {
+    _termLog('warn', 'DISCONNECTED from ' + (msg.name || msg.device || '?'));
   }
 }
 
@@ -989,6 +1521,16 @@ document.addEventListener('DOMContentLoaded', () => {
     _renderHeatmap();
     _renderCoLocationGraph();
     _renderThreats();
+    _renderGraveyard();
+    _renderTerminal();
+
+    // Start packet storm animation
+    _renderPacketStorm();
+
+    // Terminal boot sequence
+    _termLog('scan', 'BLE Dashboard v1.0 initialized');
+    _termLog('scan', 'Radar styles: ' + RADAR_STYLES.length + ' loaded');
+    _termLog('scan', 'Systems online — awaiting scan...');
 
     // Periodic refresh
     setInterval(() => {
@@ -1001,6 +1543,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => {
       _renderHeatmap();
       _renderCoLocationGraph();
+      _renderRfWaterfall();
     });
   }, 800);
 });

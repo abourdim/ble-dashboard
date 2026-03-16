@@ -264,6 +264,117 @@
 }
 
 /* ═══════════════════════════════════
+   6. MATRIX RAIN (Digital green rain)
+   ═══════════════════════════════════ */
+.radar-matrix .ble-radar-circle {
+  background: radial-gradient(circle, rgba(0,255,65,.03) 0%, rgba(0,0,0,.4) 70%);
+  border-color: rgba(0,255,65,.2);
+}
+.radar-matrix .ble-radar-ring {
+  border-color: rgba(0,255,65,.08);
+  border-style: solid;
+}
+.radar-matrix .ble-radar-sweep {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(0,255,65,.08) 10deg,
+    rgba(0,255,65,.02) 25deg,
+    transparent 40deg
+  );
+  animation-duration: 1.5s;
+}
+.radar-matrix .ble-radar-circle::before,
+.radar-matrix .ble-radar-circle::after {
+  background: rgba(0,255,65,.05);
+}
+.radar-matrix .ble-radar-label { color: rgba(0,255,65,.3); }
+.radar-matrix .ble-radar-center { filter: drop-shadow(0 0 12px rgba(0,255,65,.6)); }
+.radar-matrix .ble-radar-blip-name {
+  color: #00ff41; text-shadow: 0 0 8px rgba(0,255,65,.5);
+  font-family: 'Courier New', monospace !important;
+}
+.radar-matrix .ble-radar-blip-rssi { color: rgba(0,255,65,.4); }
+.radar-matrix .ble-radar-dot {
+  background: #00ff41 !important;
+  box-shadow: 0 0 8px #00ff41, 0 0 16px rgba(0,255,65,.3) !important;
+  animation: matrixGlitch .5s ease-in-out infinite !important;
+}
+@keyframes matrixGlitch {
+  0%,100% { opacity:1; transform:none; }
+  50% { opacity:.7; transform:skewX(2deg); }
+}
+/* Matrix rain canvas overlay */
+.radar-matrix .matrix-rain-overlay {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; z-index:1; border-radius:50%; overflow:hidden;
+  opacity:.15;
+}
+/* Digital readout */
+.radar-matrix .matrix-readout {
+  position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  font-family:'Courier New',monospace; font-size:.5rem; color:#00ff41;
+  z-index:5; pointer-events:none; opacity:.6;
+  white-space:nowrap; letter-spacing:.1em;
+}
+
+/* ═══════════════════════════════════
+   7. SUBMARINE (Deep ocean blue)
+   ═══════════════════════════════════ */
+.radar-submarine .ble-radar-circle {
+  background: radial-gradient(circle, rgba(6,78,140,.15) 0%, rgba(0,10,30,.5) 70%);
+  border: 2px solid rgba(14,165,233,.2);
+}
+.radar-submarine .ble-radar-ring {
+  border-color: rgba(14,165,233,.1);
+  border-style: dashed;
+  border-width: 1px;
+}
+.radar-submarine .ble-radar-sweep {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(14,165,233,.1) 30deg,
+    rgba(14,165,233,.02) 60deg,
+    transparent 80deg
+  );
+  animation-duration: 4s;
+}
+.radar-submarine .ble-radar-circle::before,
+.radar-submarine .ble-radar-circle::after {
+  background: rgba(14,165,233,.06);
+}
+.radar-submarine .ble-radar-label { color: rgba(14,165,233,.35); }
+.radar-submarine .ble-radar-blip-name { color: #7dd3fc; }
+.radar-submarine .ble-radar-blip-rssi { color: rgba(14,165,233,.5); }
+.radar-submarine .ble-radar-dot {
+  animation: subPing 2s ease-in-out infinite !important;
+}
+@keyframes subPing {
+  0%,100% { box-shadow: 0 0 4px currentColor; }
+  50% { box-shadow: 0 0 4px currentColor, 0 0 10px currentColor, 0 0 20px rgba(14,165,233,.15); }
+}
+/* Depth gauge */
+.radar-submarine .sub-depth {
+  position:absolute; left:8px; top:50%; transform:translateY(-50%);
+  font-family:'Orbitron',monospace; font-size:.45rem; font-weight:700;
+  color:rgba(14,165,233,.5); z-index:5; pointer-events:none;
+  writing-mode:vertical-lr; text-orientation:mixed;
+  letter-spacing:.15em;
+}
+/* Bubble particles */
+.radar-submarine .sub-bubble {
+  position:absolute; width:4px; height:4px; border-radius:50%;
+  border:1px solid rgba(14,165,233,.2);
+  animation: bubbleRise 4s ease-in infinite;
+  pointer-events:none; z-index:1;
+}
+@keyframes bubbleRise {
+  0% { bottom:10%; opacity:.6; transform:translateX(0); }
+  100% { bottom:90%; opacity:0; transform:translateX(10px); }
+}
+
+/* ═══════════════════════════════════
    SHARED: radar container extras
    ═══════════════════════════════════ */
 .ble-radar-container { position:relative; }

@@ -17,8 +17,8 @@
   <link rel="stylesheet" href="ble.css?v=8" />
   <link rel="stylesheet" href="sdr.css?v=3" />
   <link rel="stylesheet" href="badges.css?v=2" />
-  <link rel="stylesheet" href="radar-styles.css?v=1" />
-  <link rel="stylesheet" href="features.css?v=1" />
+  <link rel="stylesheet" href="radar-styles.css?v=2" />
+  <link rel="stylesheet" href="features.css?v=2" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
@@ -124,6 +124,8 @@
             <button class="radar-style-btn" data-style="thermal" onclick="setRadarStyle('thermal')">Thermal</button>
             <button class="radar-style-btn" data-style="sonar" onclick="setRadarStyle('sonar')">Sonar</button>
             <button class="radar-style-btn" data-style="constellation" onclick="setRadarStyle('constellation')">Stars</button>
+            <button class="radar-style-btn" data-style="matrix" onclick="setRadarStyle('matrix')">Matrix</button>
+            <button class="radar-style-btn" data-style="submarine" onclick="setRadarStyle('submarine')">Sub</button>
           </div>
           <div id="soundViz" class="sound-visualizer" style="display:none;justify-content:center;padding:4px 0">
             <div class="sound-bar"></div><div class="sound-bar"></div><div class="sound-bar"></div><div class="sound-bar"></div><div class="sound-bar"></div>
@@ -323,17 +325,104 @@
         </div>
 
         <!-- Threat Detector -->
-        <div style="padding:12px 0">
+        <div style="padding:12px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
           <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#38bdf8; margin-bottom:8px; padding:0 4px;">🛡️ Threat Detector</div>
           <div id="threatPanel" class="threat-panel">
             <div style="text-align:center;padding:12px;color:var(--text-dim);font-size:.7rem">✅ No threats detected — all clear!</div>
           </div>
         </div>
 
+        <!-- Stealth Meter -->
+        <div style="padding:12px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#38bdf8; margin-bottom:8px; padding:0 4px;">🥷 Stealth Meter</div>
+          <div id="stealthList" class="stealth-list">
+            <div style="text-align:center;padding:12px;color:var(--text-dim);font-size:.7rem">Scan to analyze device stealth levels</div>
+          </div>
+        </div>
+
+        <!-- Scan Diff -->
+        <div style="padding:12px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#38bdf8; margin-bottom:8px; padding:0 4px;">🔀 Scan Diff</div>
+          <div id="diffSummary" class="diff-summary"></div>
+          <div id="diffView" class="diff-wrap">
+            <div style="text-align:center;color:var(--text-dim);font-size:.7rem;padding:8px">Run 2 scans to see diff</div>
+          </div>
+        </div>
+
+        <!-- Device Graveyard -->
+        <div style="padding:12px 0">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#38bdf8; margin-bottom:8px; padding:0 4px;">🪦 Device Graveyard</div>
+          <div id="graveyardGrid" class="graveyard-grid">
+            <div style="text-align:center;color:var(--text-dim);font-size:.7rem;padding:12px;grid-column:1/-1">No departed devices yet...</div>
+          </div>
+        </div>
+
       </div>
     </details>
 
-    <!-- ══════ CARD 7 — SDR SPECTRUM ══════ -->
+    <!-- ══════ CARD 7 — HACKER LAB ══════ -->
+    <details class="collapsible section-lab">
+      <summary><span class="icon">🧪</span> Hacker Lab</summary>
+      <div class="card section-lab">
+
+        <!-- Device Autopsy -->
+        <div style="padding:8px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#22c55e; margin-bottom:8px; padding:0 4px;">🔬 Device Autopsy</div>
+          <div id="autopsyPanel" class="autopsy-panel">
+            <div style="text-align:center;padding:12px;color:var(--text-dim);font-size:.7rem">Click a device in Time Travel or Radar to autopsy it</div>
+          </div>
+        </div>
+
+        <!-- Packet Storm -->
+        <div style="padding:12px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#22c55e; margin-bottom:8px; padding:0 4px;">⚡ Packet Storm</div>
+          <div class="packet-storm-wrap">
+            <canvas id="packetStormCanvas"></canvas>
+            <div id="packetStormStats" class="packet-storm-stats">0 pkts</div>
+          </div>
+        </div>
+
+        <!-- Time Travel Scanner -->
+        <div style="padding:12px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#22c55e; margin-bottom:8px; padding:0 4px;">⏳ Time Travel Scanner</div>
+          <div class="timetravel-wrap">
+            <div class="timetravel-slider-row">
+              <span style="font-size:.7rem;color:var(--text-dim)">Past</span>
+              <input id="timeTravelSlider" class="timetravel-slider" type="range" min="0" max="0" value="0" oninput="onTimeTravelSlide(this.value)" />
+              <span id="timeTravelTime" class="timetravel-time">--:--:--</span>
+              <span style="font-size:.7rem;color:var(--text-dim)">Now</span>
+            </div>
+            <div id="timeTravelView" class="timetravel-snapshot">
+              <div style="text-align:center;color:var(--text-dim);font-size:.7rem;padding:8px;width:100%">No snapshots yet — start scanning</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RF Spectrum Mini-Waterfall -->
+        <div style="padding:12px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#22c55e; margin-bottom:8px; padding:0 4px;">📻 RF Channel Waterfall</div>
+          <div class="rf-mini-wrap"><canvas id="rfMiniCanvas"></canvas></div>
+          <div class="rf-mini-axis"><span>Ch 0</span><span>Ch 10</span><span>Ch 20</span><span>Ch 30</span><span>Ch 37-39 (ADV)</span></div>
+        </div>
+
+        <!-- Terminal Hacker View -->
+        <div style="padding:12px 0">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#22c55e; margin-bottom:8px; padding:0 4px;">💻 Terminal</div>
+          <div class="terminal-wrap">
+            <div class="terminal-header">
+              <span class="terminal-dot r"></span>
+              <span class="terminal-dot y"></span>
+              <span class="terminal-dot g"></span>
+              <span class="terminal-title">root@ble-dashboard:~</span>
+            </div>
+            <div id="terminalBody" class="terminal-body"></div>
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- ══════ CARD 8 — SDR SPECTRUM ══════ -->
     <details class="collapsible section-sdr">
       <summary><span class="icon">📻</span> <span data-i18n="sdrTitle">SDR Spectrum (2.4 GHz)</span></summary>
       <div class="card section-sdr">
@@ -642,6 +731,6 @@
 <script src="ble.js?v=7"></script>
 <script src="sdr.js?v=1"></script>
 <script src="badges.js?v=2"></script>
-<script src="features.js?v=1"></script>
+<script src="features.js?v=2"></script>
 </body>
 </html>

@@ -270,7 +270,263 @@ details.section-command > summary .icon { color: #38bdf8; }
 }
 
 /* ═══════════════════════════════════
-   RESPONSIVE
+   DEVICE AUTOPSY
+   ═══════════════════════════════════ */
+.autopsy-panel {
+  padding:8px 0;
+}
+.autopsy-card {
+  background:rgba(255,255,255,.02); border:1px solid var(--border,rgba(255,255,255,.08));
+  border-radius:10px; padding:12px; margin-bottom:8px;
+}
+.autopsy-header {
+  display:flex; align-items:center; gap:8px; margin-bottom:8px;
+}
+.autopsy-title {
+  font-family:'Orbitron',monospace; font-size:.7rem; font-weight:700;
+  color:var(--text,#e0e8ff);
+}
+.autopsy-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:6px;
+}
+.autopsy-field {
+  padding:4px 8px; border-radius:4px;
+  background:rgba(255,255,255,.03);
+}
+.autopsy-label {
+  font-size:.5rem; color:var(--text-dim,#7a8aaa);
+  text-transform:uppercase; letter-spacing:.04em;
+}
+.autopsy-value {
+  font-family:'Orbitron',monospace; font-size:.65rem; font-weight:600;
+  color:var(--text,#e0e8ff); word-break:break-all;
+}
+.autopsy-mac-bytes {
+  display:flex; gap:3px; margin-top:4px;
+}
+.autopsy-byte {
+  font-family:'Courier New',monospace; font-size:.6rem; font-weight:700;
+  padding:2px 4px; border-radius:3px; text-align:center;
+  border:1px solid rgba(255,255,255,.1);
+}
+.autopsy-signal-physics {
+  margin-top:8px; padding:8px; border-radius:6px;
+  background:rgba(56,189,248,.04); border:1px solid rgba(56,189,248,.1);
+  font-family:'Courier New',monospace; font-size:.6rem; color:#7dd3fc;
+  line-height:1.6;
+}
+
+/* ═══════════════════════════════════
+   PACKET STORM VISUALIZER
+   ═══════════════════════════════════ */
+.packet-storm-wrap {
+  position:relative; width:100%; height:150px;
+  background:var(--bg-deep,#06071a); border-radius:8px;
+  overflow:hidden; border:1px solid var(--border,rgba(255,255,255,.08));
+}
+.packet-storm-wrap canvas { width:100%; height:100%; display:block; }
+.packet-storm-stats {
+  position:absolute; top:6px; right:8px;
+  font-family:'Orbitron',monospace; font-size:.5rem;
+  color:rgba(255,255,255,.4); pointer-events:none;
+}
+
+/* ═══════════════════════════════════
+   TIME TRAVEL SCANNER
+   ═══════════════════════════════════ */
+.timetravel-wrap {
+  padding:8px 0;
+}
+.timetravel-slider-row {
+  display:flex; align-items:center; gap:8px; margin-bottom:8px;
+}
+.timetravel-slider {
+  flex:1; -webkit-appearance:none; height:4px;
+  background:rgba(255,255,255,.1); border-radius:2px; outline:none;
+}
+.timetravel-slider::-webkit-slider-thumb {
+  -webkit-appearance:none; width:14px; height:14px;
+  border-radius:50%; background:#38bdf8; cursor:pointer;
+  box-shadow:0 0 6px rgba(56,189,248,.4);
+}
+.timetravel-time {
+  font-family:'Orbitron',monospace; font-size:.6rem; color:var(--text-dim,#7a8aaa);
+  min-width:55px; text-align:center;
+}
+.timetravel-snapshot {
+  display:flex; flex-wrap:wrap; gap:6px;
+}
+.timetravel-device {
+  padding:4px 8px; border-radius:6px;
+  background:rgba(255,255,255,.03); border:1px solid var(--border,rgba(255,255,255,.06));
+  font-size:.65rem; color:var(--text,#e0e8ff);
+  display:flex; align-items:center; gap:6px;
+}
+.timetravel-device .tt-rssi {
+  font-family:'Orbitron',monospace; font-size:.55rem; font-weight:700;
+}
+
+/* ═══════════════════════════════════
+   DEVICE GRAVEYARD
+   ═══════════════════════════════════ */
+.graveyard-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:8px; padding:4px 0;
+}
+.tombstone {
+  background:rgba(255,255,255,.02); border:1px solid rgba(148,163,184,.1);
+  border-radius:10px 10px 4px 4px; padding:10px 8px;
+  text-align:center; position:relative; overflow:hidden;
+  animation:tombstoneFadeIn .5s ease;
+}
+.tombstone::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,transparent,rgba(148,163,184,.2),transparent);
+}
+.tombstone-icon { font-size:1.5rem; margin-bottom:4px; }
+.tombstone-name {
+  font-family:'Orbitron',monospace; font-size:.6rem; font-weight:700;
+  color:var(--text-dim,#7a8aaa); margin-bottom:2px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.tombstone-date {
+  font-size:.5rem; color:rgba(148,163,184,.4);
+}
+.tombstone-rip {
+  font-size:.45rem; color:rgba(148,163,184,.3);
+  font-style:italic; margin-top:4px;
+}
+@keyframes tombstoneFadeIn {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* ═══════════════════════════════════
+   RF SPECTRUM MINI-WATERFALL
+   ═══════════════════════════════════ */
+.rf-mini-wrap {
+  position:relative; width:100%; height:100px;
+  background:var(--bg-deep,#06071a); border-radius:8px;
+  overflow:hidden; border:1px solid var(--border,rgba(255,255,255,.08));
+}
+.rf-mini-wrap canvas { width:100%; height:100%; display:block; }
+.rf-mini-axis {
+  display:flex; justify-content:space-between; padding:2px 4px;
+  font-family:'Orbitron',monospace; font-size:.45rem; color:var(--text-dim,#556);
+}
+
+/* ═══════════════════════════════════
+   STEALTH METER
+   ═══════════════════════════════════ */
+.stealth-list {
+  padding:4px 0;
+}
+.stealth-row {
+  display:flex; align-items:center; gap:8px; padding:5px 8px;
+  border-bottom:1px solid var(--border,rgba(255,255,255,.04));
+}
+.stealth-name {
+  flex:1; font-size:.7rem; color:var(--text,#e0e8ff);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  max-width:120px;
+}
+.stealth-bar-wrap {
+  flex:1; height:6px; background:rgba(255,255,255,.06);
+  border-radius:3px; overflow:hidden;
+}
+.stealth-bar {
+  height:100%; border-radius:3px; transition:width .5s ease;
+}
+.stealth-score {
+  font-family:'Orbitron',monospace; font-size:.55rem; font-weight:700;
+  min-width:30px; text-align:right;
+}
+.stealth-tactics {
+  font-size:.5rem; color:var(--text-dim,#7a8aaa);
+  display:flex; gap:3px;
+}
+.stealth-tag {
+  padding:1px 4px; border-radius:2px; font-size:.45rem;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+}
+
+/* ═══════════════════════════════════
+   TERMINAL HACKER VIEW
+   ═══════════════════════════════════ */
+.terminal-wrap {
+  position:relative; width:100%; height:200px;
+  background:#0a0a0a; border-radius:8px;
+  overflow:hidden; border:1px solid rgba(0,255,65,.15);
+  font-family:'Courier New',monospace;
+}
+.terminal-header {
+  display:flex; align-items:center; gap:6px; padding:4px 8px;
+  background:rgba(0,255,65,.05); border-bottom:1px solid rgba(0,255,65,.1);
+}
+.terminal-dot { width:6px; height:6px; border-radius:50%; }
+.terminal-dot.r { background:#ef4444; }
+.terminal-dot.y { background:#eab308; }
+.terminal-dot.g { background:#22c55e; }
+.terminal-title {
+  font-size:.55rem; color:rgba(0,255,65,.5); flex:1; text-align:center;
+}
+.terminal-body {
+  padding:6px 8px; height:calc(100% - 24px); overflow-y:auto;
+  scrollbar-width:thin; scrollbar-color:rgba(0,255,65,.2) transparent;
+}
+.terminal-line {
+  font-size:.6rem; line-height:1.5; color:#00ff41; opacity:.8;
+  white-space:pre-wrap; word-break:break-all;
+}
+.terminal-line .t-time { color:rgba(0,255,65,.4); }
+.terminal-line .t-type { font-weight:700; }
+.terminal-line .t-type.scan { color:#38bdf8; }
+.terminal-line .t-type.conn { color:#22c55e; }
+.terminal-line .t-type.warn { color:#eab308; }
+.terminal-line .t-type.err { color:#ef4444; }
+.terminal-cursor {
+  display:inline-block; width:6px; height:12px; background:#00ff41;
+  animation:termBlink 1s step-end infinite; vertical-align:middle;
+}
+@keyframes termBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ═══════════════════════════════════
+   SCAN DIFF MODE
+   ═══════════════════════════════════ */
+.diff-wrap { padding:4px 0; }
+.diff-summary {
+  display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap;
+}
+.diff-stat {
+  padding:4px 10px; border-radius:6px; font-family:'Orbitron',monospace;
+  font-size:.6rem; font-weight:700;
+}
+.diff-stat.added { background:rgba(34,197,94,.1); color:#22c55e; border:1px solid rgba(34,197,94,.2); }
+.diff-stat.removed { background:rgba(239,68,68,.1); color:#ef4444; border:1px solid rgba(239,68,68,.2); }
+.diff-stat.changed { background:rgba(234,179,8,.1); color:#eab308; border:1px solid rgba(234,179,8,.2); }
+.diff-stat.same { background:rgba(148,163,184,.1); color:#94a3b8; border:1px solid rgba(148,163,184,.2); }
+.diff-list { font-size:.7rem; }
+.diff-item {
+  display:flex; align-items:center; gap:6px; padding:3px 6px;
+  border-bottom:1px solid var(--border,rgba(255,255,255,.04));
+}
+.diff-item.add { color:#22c55e; }
+.diff-item.rem { color:#ef4444; text-decoration:line-through; opacity:.6; }
+.diff-item.chg { color:#eab308; }
+.diff-marker { font-weight:700; font-family:monospace; min-width:14px; }
+
+/* ═══════════════════════════════════
+   SECTION ACCENT — LAB (green)
+   ═══════════════════════════════════ */
+details.section-lab > summary { border-left: 3px solid #22c55e !important; }
+.card.section-lab {
+  border-left: 3px solid #22c55e !important;
+  background: linear-gradient(90deg, rgba(34,197,94,.06), transparent 40%), var(--panel);
+}
+details.section-lab > summary .icon { color: #22c55e; }
+
+/* ═══════════════════════════════════
+   RESPONSIVE (updated)
    ═══════════════════════════════════ */
 @media (max-width:640px) {
   .mission-grid { grid-template-columns:1fr; }
@@ -280,4 +536,8 @@ details.section-command > summary .icon { color: #38bdf8; }
   .coloc-wrap { height:180px; }
   .heatmap-wrap { height:80px; }
   .radar-style-bar { flex-wrap:wrap; }
+  .graveyard-grid { grid-template-columns:repeat(2,1fr); }
+  .autopsy-grid { grid-template-columns:1fr; }
+  .terminal-wrap { height:150px; }
+  .packet-storm-wrap { height:100px; }
 }
