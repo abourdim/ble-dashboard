@@ -2403,6 +2403,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const pc=document.getElementById('chartPause');
   if(pc) pc.addEventListener('change', e=>{ ble.chartPaused=e.target.checked; });
 
+  // Auto-setup: hide unknown ON, radar mode ON, auto-scan after WS connects
+  const hideChkInit = document.getElementById('hideUnknownChk');
+  if (hideChkInit) hideChkInit.checked = true;
+  // Activate radar view on startup
+  setTimeout(() => { if (!_radarMode) toggleRadarView(); }, 300);
+  // Auto-start scan once WebSocket is connected (give it time)
+  setTimeout(() => { bleScan(); }, 1200);
+
   log('📡 BLE Dashboard v1.0 ready','success');
   _timelineEvent('Dashboard Ready', 'v1.0', 'success');
 });

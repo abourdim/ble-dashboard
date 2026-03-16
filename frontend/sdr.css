@@ -2,14 +2,14 @@
    sdr.css  — SDR Spectrum Analyzer styles
    ═══════════════════════════════════════════ */
 
-/* Section accent — indigo */
-details.section-sdr > summary { border-left: 3px solid #818cf8 !important; }
+/* Section accent — teal */
+details.section-sdr > summary { border-left: 3px solid #2dd4bf !important; }
 .card.section-sdr {
-  border-left: 3px solid #818cf8 !important;
-  background: linear-gradient(90deg, rgba(129,140,248,.06), transparent 40%), var(--panel);
+  border-left: 3px solid #2dd4bf !important;
+  background: linear-gradient(90deg, rgba(45,212,191,.06), transparent 40%), var(--panel);
 }
-details.section-sdr > summary .icon { color: #818cf8; }
-.light-theme .card.section-sdr { background: linear-gradient(90deg, rgba(129,140,248,.08), transparent 40%), var(--panel); }
+details.section-sdr > summary .icon { color: #2dd4bf; }
+.light-theme .card.section-sdr { background: linear-gradient(90deg, rgba(45,212,191,.08), transparent 40%), var(--panel); }
 
 /* ── Controls row ── */
 .sdr-controls {
@@ -25,7 +25,7 @@ details.section-sdr > summary .icon { color: #818cf8; }
 .sdr-sub-title {
   font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700;
   text-transform:uppercase; letter-spacing:.06em;
-  color:#818cf8; margin-bottom:8px; padding:0 4px;
+  color:#2dd4bf; margin-bottom:8px; padding:0 4px;
 }
 
 /* ── Waterfall canvas ── */
@@ -52,7 +52,7 @@ details.section-sdr > summary .icon { color: #818cf8; }
 }
 .sdr-legend-bar {
   width:120px; height:8px; border-radius:4px;
-  background: linear-gradient(90deg, #0d0887, #7e03a8, #cc4778, #f0723e, #f0f921);
+  background: linear-gradient(90deg, #0d1b2a, #1b4965, #2dd4bf, #fb923c, #f0f921);
 }
 .sdr-legend-label { font-family:'Orbitron',monospace; }
 
@@ -82,7 +82,7 @@ details.section-sdr > summary .icon { color: #818cf8; }
   padding:2px 8px; border-radius:4px;
 }
 .sdr-status.active {
-  background:rgba(129,140,248,.15); color:#818cf8;
+  background:rgba(45,212,191,.15); color:#2dd4bf;
   animation: sdrPulse 1.5s ease-in-out infinite;
 }
 .sdr-status.idle { color:var(--text-dim,#556); }

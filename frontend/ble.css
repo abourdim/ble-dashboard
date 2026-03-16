@@ -15,18 +15,18 @@
 }
 .section-scanner .card-title .icon { color: #38bdf8; }
 
-/* Service Explorer — purple (HERO card — highest visual priority) */
-details.section-explorer > summary { border-left: 4px solid #a78bfa !important; font-size:1.05em; }
+/* Service Explorer — steel-blue (HERO card — highest visual priority) */
+details.section-explorer > summary { border-left: 4px solid #64748b !important; font-size:1.05em; }
 .card.section-explorer {
-  border-left: 4px solid #a78bfa !important;
-  background: linear-gradient(90deg, rgba(167,139,250,.06), transparent 40%), var(--panel);
+  border-left: 4px solid #64748b !important;
+  background: linear-gradient(90deg, rgba(100,116,139,.06), transparent 40%), var(--panel);
 }
 .card.section-explorer-hero {
-  background: linear-gradient(180deg, rgba(167,139,250,.14) 0%, rgba(167,139,250,.04) 30%, var(--panel) 100%) !important;
-  border-top: 2px solid #a78bfa !important;
-  box-shadow: 0 0 20px rgba(167,139,250,.08), inset 0 1px 0 rgba(167,139,250,.15);
+  background: linear-gradient(180deg, rgba(100,116,139,.14) 0%, rgba(100,116,139,.04) 30%, var(--panel) 100%) !important;
+  border-top: 2px solid #64748b !important;
+  box-shadow: 0 0 20px rgba(100,116,139,.08), inset 0 1px 0 rgba(100,116,139,.15);
 }
-details.section-explorer > summary .icon { color: #a78bfa; }
+details.section-explorer > summary .icon { color: #64748b; }
 
 /* Scanner — collapsible */
 details.section-scanner > summary { border-left: 3px solid #38bdf8 !important; }
@@ -52,8 +52,8 @@ details.section-multi > summary .icon { color: #fb923c; }
 
 /* Light theme — slightly stronger tints */
 .light-theme .card.section-scanner { background: linear-gradient(90deg, rgba(56,189,248,.08), transparent 40%), var(--panel); }
-.light-theme .card.section-explorer { background: linear-gradient(90deg, rgba(167,139,250,.08), transparent 40%), var(--panel); }
-.light-theme .card.section-explorer-hero { background: linear-gradient(180deg, rgba(167,139,250,.12) 0%, rgba(167,139,250,.03) 30%, var(--panel) 100%) !important; }
+.light-theme .card.section-explorer { background: linear-gradient(90deg, rgba(100,116,139,.08), transparent 40%), var(--panel); }
+.light-theme .card.section-explorer-hero { background: linear-gradient(180deg, rgba(100,116,139,.12) 0%, rgba(100,116,139,.03) 30%, var(--panel) 100%) !important; }
 .light-theme .card.section-monitor { background: linear-gradient(90deg, rgba(52,211,153,.08), transparent 40%), var(--panel); }
 .light-theme .card.section-multi { background: linear-gradient(90deg, rgba(251,146,60,.08), transparent 40%), var(--panel); }
 
@@ -284,7 +284,7 @@ details.section-multi > summary .icon { color: #fb923c; }
 /* Cycling service-group accent colors */
 .ble-svc-group { --svc-accent: #38bdf8; margin-bottom:0; border:1px solid var(--border,rgba(255,255,255,.08)); border-radius:10px; overflow:hidden; border-left:3px solid var(--svc-accent); }
 .ble-svc-group:nth-child(6n+1) { --svc-accent: #38bdf8; }  /* cyan */
-.ble-svc-group:nth-child(6n+2) { --svc-accent: #a78bfa; }  /* purple */
+.ble-svc-group:nth-child(6n+2) { --svc-accent: #0ea5e9; }  /* sky blue */
 .ble-svc-group:nth-child(6n+3) { --svc-accent: #34d399; }  /* emerald */
 .ble-svc-group:nth-child(6n+4) { --svc-accent: #fb923c; }  /* orange */
 .ble-svc-group:nth-child(6n+5) { --svc-accent: #64748b; }  /* steel */
@@ -336,7 +336,7 @@ details.section-multi > summary .icon { color: #fb923c; }
 .ble-prop-badge.read    { background:rgba(0,170,255,.15); color:#00aaff; }
 .ble-prop-badge.write   { background:rgba(255,153,0,.15); color:#ff9900; }
 .ble-prop-badge.notify  { background:rgba(34,204,136,.15); color:#22cc88; }
-.ble-prop-badge.indicate { background:rgba(170,85,255,.15); color:#aa55ff; }
+.ble-prop-badge.indicate { background:rgba(100,116,139,.15); color:#94a3b8; }
 
 .ble-char-actions { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
 .ble-char-value {
@@ -502,7 +502,7 @@ details.section-multi > summary .icon { color: #fb923c; }
 .ws-pkt-notify  { background:rgba(34,204,136,.04); }
 .ws-pkt-read    { background:rgba(85,153,255,.04); }
 .ws-pkt-write   { background:rgba(255,153,0,.04); }
-.ws-pkt-subscribe { background:rgba(170,85,255,.04); }
+.ws-pkt-subscribe { background:rgba(14,165,233,.04); }
 .ws-pkt-error   { background:rgba(255,68,85,.08); }
 .ws-pkt-connect { background:rgba(0,221,204,.04); }
 .ws-pkt-scan    { background:rgba(122,138,170,.02); }
@@ -578,15 +578,15 @@ details.section-multi > summary .icon { color: #fb923c; }
 .nrf-adv-summary { display:flex; flex-wrap:wrap; gap:3px; margin-top:3px; }
 .nrf-adv-tag {
   font-size:.58rem; padding:1px 5px; border-radius:3px;
-  background:rgba(170,85,255,.12); color:#bb88ff;
+  background:rgba(14,165,233,.12); color:#38bdf8;
   font-family:'Orbitron',monospace; letter-spacing:.02em;
 }
 .nrf-adv-btn {
   font-size:.55rem !important; padding:2px 5px !important; min-width:28px;
-  background:rgba(170,85,255,.15) !important; color:#bb88ff !important;
-  border:1px solid rgba(170,85,255,.25) !important;
+  background:rgba(14,165,233,.15) !important; color:#38bdf8 !important;
+  border:1px solid rgba(14,165,233,.25) !important;
 }
-.nrf-adv-btn:hover { background:rgba(170,85,255,.3) !important; }
+.nrf-adv-btn:hover { background:rgba(14,165,233,.3) !important; }
 
 /* ── Advertisement Data Modal ── */
 .nrf-adv-modal { max-width:560px; }
@@ -597,7 +597,7 @@ details.section-multi > summary .icon { color: #fb923c; }
 .nrf-adv-uuid { font-size:.7rem; font-family:'Orbitron',monospace; color:var(--accent,#00aaff); padding:2px 0; }
 .nrf-adv-name { color:var(--text-dim,#7a8aaa); font-style:italic; }
 .nrf-adv-mfr { margin:4px 0; padding:6px; background:rgba(0,0,0,.15); border-radius:6px; }
-.nrf-adv-mfr-name { font-size:.68rem; color:#bb88ff; font-weight:600; display:block; margin-bottom:3px; }
+.nrf-adv-mfr-name { font-size:.68rem; color:#38bdf8; font-weight:600; display:block; margin-bottom:3px; }
 .nrf-adv-hex { font-size:.65rem; font-family:'Orbitron',monospace; color:var(--text,#e0e8ff); margin:3px 0; padding:0; background:none; }
 .nrf-adv-decoded { font-size:.62rem; color:#22cc88; font-family:'Orbitron',monospace; }
 .nrf-adv-svcdata { margin:4px 0; font-size:.68rem; font-family:'Orbitron',monospace; }

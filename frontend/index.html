@@ -14,8 +14,9 @@
   <meta name="theme-color" content="#08091a" />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Righteous&family=Tajawal:wght@400;500;700&family=Bangers&family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="ble.css?v=7" />
-  <link rel="stylesheet" href="sdr.css?v=2" />
+  <link rel="stylesheet" href="ble.css?v=8" />
+  <link rel="stylesheet" href="sdr.css?v=3" />
+  <link rel="stylesheet" href="badges.css?v=1" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
@@ -161,7 +162,7 @@
     <select id="charSelect" class="sidebar-select" style="display:none"></select>
 
     <!-- ══════ CARD 3 — MONITOR ══════ -->
-    <details class="collapsible section-monitor" open>
+    <details class="collapsible section-monitor">
       <summary><span class="icon">📊</span> <span data-i18n="monitorTitle">Monitor</span></summary>
       <div class="card section-monitor">
         <div class="card-header">
@@ -208,7 +209,53 @@
       </div>
     </details>
 
-    <!-- ══════ CARD 5 — SDR SPECTRUM ══════ -->
+    <!-- ══════ CARD 5 — ACHIEVEMENTS & CARDS ══════ -->
+    <details class="collapsible section-achievements">
+      <summary><span class="icon">🏆</span> Achievements &amp; Collection</summary>
+      <div class="card section-achievements">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🏆 Achievements</div>
+            <div class="card-subtitle">Complete challenges to unlock badges!</div>
+          </div>
+        </div>
+        <div class="badge-progress">
+          <div class="badge-progress-bar"><div id="badgeProgressFill" class="badge-progress-fill" style="width:0%"></div></div>
+          <span id="badgeProgressText" class="badge-progress-text">0/20</span>
+        </div>
+        <div id="badgeGrid" class="badge-grid"></div>
+
+        <!-- Signal Gauge -->
+        <div style="padding:12px 0; border-top:1px solid var(--border,rgba(255,255,255,.06)); margin-top:12px">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#f59e0b; margin-bottom:8px; padding:0 4px;">📡 Live Signal Gauge</div>
+          <div class="signal-gauge-wrap"><div id="signalGauge" class="signal-gauge"></div></div>
+        </div>
+
+        <!-- Frequency Map -->
+        <div style="padding:12px 0; border-top:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#f59e0b; margin-bottom:8px; padding:0 4px;">📻 Where is BLE? (Electromagnetic Spectrum)</div>
+          <div class="freq-map"><canvas id="freqMapCanvas"></canvas></div>
+          <div class="freq-map-labels"><span>AM</span><span>FM</span><span>TV</span><span>Cell</span><span>WiFi</span><span>BLE</span><span>5G WiFi</span><span>6E</span><span>uWave</span><span>Sat</span></div>
+        </div>
+
+        <!-- Trading Cards -->
+        <div style="padding:12px 0; border-top:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; padding:0 4px;">
+            <span style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#f59e0b;">🃏 Device Trading Cards</span>
+            <span id="cardCount" style="font-family:'Orbitron',monospace; font-size:.6rem; color:var(--text-dim,#7a8aaa);">0 collected</span>
+          </div>
+          <div id="tradingCards" class="card-collection"></div>
+        </div>
+
+        <!-- Device Diary -->
+        <div style="padding:12px 0; border-top:1px solid var(--border,rgba(255,255,255,.06))">
+          <div style="font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#f59e0b; margin-bottom:8px; padding:0 4px;">📔 Device Diary</div>
+          <div id="deviceDiary" class="device-diary"></div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ══════ CARD 6 — SDR SPECTRUM ══════ -->
     <details class="collapsible section-sdr">
       <summary><span class="icon">📻</span> <span data-i18n="sdrTitle">SDR Spectrum (2.4 GHz)</span></summary>
       <div class="card section-sdr">
@@ -277,6 +324,7 @@
     <button class="help-tab active" data-tab="faq"   data-i18n="faq">FAQ</button>
     <button class="help-tab"        data-tab="howto" data-i18n="howto">How-To</button>
     <button class="help-tab"        data-tab="wiki"  data-i18n="wiki">Wiki</button>
+    <button class="help-tab"        data-tab="academy">Academy</button>
   </div>
   <div class="sidebar-body">
     <div class="help-content active" id="helpFaq">
@@ -299,6 +347,115 @@
       <div class="wiki-entry"><h3 data-i18n="wiki_uuid_title">🔑 UUIDs</h3><p data-i18n="wiki_uuid">16-bit standard (e.g. 0x2A37 = Heart Rate) or 128-bit custom. Both supported.</p></div>
       <div class="wiki-entry"><h3 data-i18n="wiki_backend_title">🐍 Backend</h3><p data-i18n="wiki_backend">FastAPI + bleak. WS: ws://localhost:8000/ws. REST: /api/. Logs: /logs/. Linux · macOS · RPi.</p></div>
       <div class="wiki-entry"><h3 data-i18n="wiki_log_title">📜 Log</h3><p data-i18n="wiki_log">TX (blue) = sent, RX (cyan) = received. Filter by type. Export as .txt.</p></div>
+    </div>
+    <div class="help-content" id="helpAcademy">
+      <details class="academy-lesson">
+        <summary>📡 Lesson 1: What is Bluetooth?</summary>
+        <div class="academy-body">
+          <p><strong>Bluetooth</strong> is a way for devices to talk to each other using invisible radio waves. It works like a walkie-talkie but for your gadgets!</p>
+          <p><strong>BLE</strong> (Bluetooth Low Energy) is a special version that uses very little battery — perfect for sensors and wearables.</p>
+          <div class="academy-diagram">  📱 Phone ──radio waves──▶ ⌚ Watch
+  📱 Phone ──radio waves──▶ 🎧 Headphones
+  📱 Phone ──radio waves──▶ 🌡️ Temperature Sensor</div>
+          <p>BLE uses the <strong>2.4 GHz</strong> frequency — the same band as WiFi and microwave ovens!</p>
+          <div class="academy-quiz">
+            <div class="academy-quiz-q">Quiz: What does BLE stand for?</div>
+            <div class="academy-quiz-options">
+              <div class="academy-quiz-opt" onclick="quizAnswer(this, false)">Big Light Emitter</div>
+              <div class="academy-quiz-opt" data-correct="true" onclick="quizAnswer(this, true)">Bluetooth Low Energy</div>
+              <div class="academy-quiz-opt" onclick="quizAnswer(this, false)">Binary Link Engine</div>
+            </div>
+          </div>
+        </div>
+      </details>
+      <details class="academy-lesson">
+        <summary>🔑 Lesson 2: What is a byte?</summary>
+        <div class="academy-body">
+          <p>A <strong>byte</strong> is 8 bits. Each bit is a 0 or 1. A byte can hold a number from 0 to 255.</p>
+          <div class="academy-diagram">  1 bit  = 0 or 1
+  1 byte = 8 bits = 0000 0000 to 1111 1111
+  1 byte = 0 to 255 in decimal
+  1 byte = 00 to FF in hexadecimal
+
+  Example: the letter "A" = 0x41 = 65 = 0100 0001</div>
+          <p>When you read a BLE characteristic, you get <strong>bytes</strong>. The dashboard shows them as hex (like <code>FF 00 A3</code>) and also tries to decode them as text or numbers.</p>
+          <div class="academy-quiz">
+            <div class="academy-quiz-q">Quiz: What is the maximum value of one byte?</div>
+            <div class="academy-quiz-options">
+              <div class="academy-quiz-opt" onclick="quizAnswer(this, false)">100</div>
+              <div class="academy-quiz-opt" onclick="quizAnswer(this, false)">128</div>
+              <div class="academy-quiz-opt" data-correct="true" onclick="quizAnswer(this, true)">255</div>
+            </div>
+          </div>
+        </div>
+      </details>
+      <details class="academy-lesson">
+        <summary>🏗️ Lesson 3: GATT — How BLE organizes data</summary>
+        <div class="academy-body">
+          <p>BLE devices organize their data using <strong>GATT</strong> (Generic Attribute Profile). Think of it like a folder structure:</p>
+          <div class="academy-diagram">  📦 Device
+  ├── 📂 Service: "Heart Rate" (0x180D)
+  │   ├── 📄 Characteristic: "Heart Rate Measurement" (0x2A37)
+  │   └── 📄 Characteristic: "Body Sensor Location" (0x2A38)
+  ├── 📂 Service: "Battery" (0x180F)
+  │   └── 📄 Characteristic: "Battery Level" (0x2A19)
+  └── 📂 Service: "Device Info" (0x180A)
+      ├── 📄 Manufacturer Name
+      └── 📄 Firmware Version</div>
+          <p>Each characteristic has <strong>properties</strong>: Read (R), Write (W), Notify (N). Notify means the device pushes updates to you automatically!</p>
+          <div class="academy-quiz">
+            <div class="academy-quiz-q">Quiz: What does "Notify" mean in BLE?</div>
+            <div class="academy-quiz-options">
+              <div class="academy-quiz-opt" onclick="quizAnswer(this, false)">You send a notification to the device</div>
+              <div class="academy-quiz-opt" data-correct="true" onclick="quizAnswer(this, true)">The device automatically sends you updates</div>
+              <div class="academy-quiz-opt" onclick="quizAnswer(this, false)">It makes your phone vibrate</div>
+            </div>
+          </div>
+        </div>
+      </details>
+      <details class="academy-lesson">
+        <summary>📻 Lesson 4: Radio waves and frequency</summary>
+        <div class="academy-body">
+          <p>Everything wireless uses <strong>radio waves</strong> — invisible waves that travel at the speed of light. Different frequencies are used for different things:</p>
+          <div class="academy-diagram">  FM Radio    = 88–108 MHz       (music)
+  WiFi        = 2.4 GHz + 5 GHz  (internet)
+  BLE         = 2.4 GHz          (sensors)
+  Cell/4G/5G  = 700–2600 MHz     (phone calls)
+
+  MHz = millions of waves per second
+  GHz = billions of waves per second</div>
+          <p>BLE uses <strong>40 channels</strong> in the 2.4 GHz band. 3 channels (37, 38, 39) are for <strong>advertising</strong> — that's how devices announce "I'm here!". The other 37 channels are for data, and BLE hops between them to avoid interference.</p>
+          <div class="academy-quiz">
+            <div class="academy-quiz-q">Quiz: How many channels does BLE use?</div>
+            <div class="academy-quiz-options">
+              <div class="academy-quiz-opt" onclick="quizAnswer(this, false)">10</div>
+              <div class="academy-quiz-opt" data-correct="true" onclick="quizAnswer(this, true)">40</div>
+              <div class="academy-quiz-opt" onclick="quizAnswer(this, false)">100</div>
+            </div>
+          </div>
+        </div>
+      </details>
+      <details class="academy-lesson">
+        <summary>📏 Lesson 5: RSSI — measuring invisible signals</summary>
+        <div class="academy-body">
+          <p><strong>RSSI</strong> (Received Signal Strength Indicator) tells you how strong a radio signal is. It's measured in <strong>dBm</strong> (decibels relative to milliwatt).</p>
+          <p>The values are always negative — closer to 0 = stronger signal:</p>
+          <div class="academy-diagram">  -30 dBm = EXCELLENT (almost touching)
+  -50 dBm = GOOD     (same room)
+  -70 dBm = OK       (next room)
+  -90 dBm = WEAK     (far away)
+ -100 dBm = LOST     (out of range)</div>
+          <p>The radar view uses RSSI to estimate distance. Try walking around with a BLE device and watch the signal change!</p>
+          <div class="academy-quiz">
+            <div class="academy-quiz-q">Quiz: Which RSSI value means the strongest signal?</div>
+            <div class="academy-quiz-options">
+              <div class="academy-quiz-opt" onclick="quizAnswer(this, false)">-90 dBm</div>
+              <div class="academy-quiz-opt" onclick="quizAnswer(this, false)">-60 dBm</div>
+              <div class="academy-quiz-opt" data-correct="true" onclick="quizAnswer(this, true)">-30 dBm</div>
+            </div>
+          </div>
+        </div>
+      </details>
     </div>
   </div>
   <div class="sidebar-footer"><span>BLE Dashboard</span><span class="badge"><strong>v1.0</strong></span></div>
@@ -404,7 +561,8 @@
 </div>
 
 <script src="script.js"></script>
-<script src="ble.js?v=5"></script>
+<script src="ble.js?v=6"></script>
 <script src="sdr.js?v=1"></script>
+<script src="badges.js?v=1"></script>
 </body>
 </html>
