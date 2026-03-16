@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BLE Dashboard — Help &amp; FAQ</title>
+  <style>
+    :root {
+      --bg: #0a0b1e; --panel: #111333; --border: rgba(255,255,255,.08);
+      --text: #e0e4f0; --dim: #7a8aaa; --accent: #38bdf8;
+      --green: #22c55e; --yellow: #eab308; --red: #ef4444;
+      --indigo: #818cf8; --teal: #2dd4bf; --purple: #a78bfa;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.7;
+      max-width: 860px; margin: 0 auto; padding: 32px 20px;
+    }
+    h1 { font-size: 2rem; color: var(--accent); text-align: center; margin-bottom: 8px; }
+    .subtitle { text-align: center; color: var(--dim); margin-bottom: 40px; font-size: .95rem; }
+    h2 {
+      font-size: 1.2rem; color: var(--indigo); margin: 36px 0 16px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    p, li { margin-bottom: 8px; }
+    ul { padding-left: 24px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    code {
+      font-family: 'Fira Code', 'Consolas', monospace;
+      background: rgba(56,189,248,.1); color: var(--accent);
+      padding: 2px 8px; border-radius: 4px; font-size: .88rem;
+    }
+    pre {
+      background: #0d0f2a; border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px 20px; overflow-x: auto;
+      margin: 12px 0; font-size: .85rem; line-height: 1.6;
+    }
+    pre code { background: none; padding: 0; }
+
+    details.faq {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 10px; margin: 10px 0; overflow: hidden;
+    }
+    details.faq summary {
+      padding: 14px 20px; cursor: pointer; font-weight: 600;
+      color: var(--text); user-select: none;
+      transition: background .2s;
+    }
+    details.faq summary:hover { background: rgba(56,189,248,.05); }
+    details.faq[open] summary { border-bottom: 1px solid var(--border); color: var(--accent); }
+    details.faq .answer { padding: 14px 20px; color: var(--dim); }
+    details.faq .answer p { color: var(--dim); }
+
+    .tip {
+      background: rgba(34,197,94,.08); border-left: 3px solid var(--green);
+      border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: .88rem;
+    }
+    .warn {
+      background: rgba(234,179,8,.08); border-left: 3px solid var(--yellow);
+      border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: .88rem;
+    }
+    .error-box {
+      background: rgba(239,68,68,.08); border-left: 3px solid var(--red);
+      border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: .88rem;
+    }
+
+    table {
+      width: 100%; border-collapse: collapse; margin: 16px 0;
+      font-size: .88rem;
+    }
+    th, td {
+      padding: 10px 14px; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th { color: var(--accent); font-weight: 600; }
+    td { color: var(--dim); }
+
+    .nav-links {
+      display: flex; gap: 16px; justify-content: center;
+      margin: 40px 0 20px; flex-wrap: wrap;
+    }
+    .nav-links a {
+      background: var(--panel); border: 1px solid var(--border);
+      padding: 10px 20px; border-radius: 8px; font-weight: 600;
+      transition: border-color .2s;
+    }
+    .nav-links a:hover { border-color: var(--accent); text-decoration: none; }
+
+    .footer { text-align: center; color: var(--dim); margin-top: 48px; font-size: .8rem; }
+  </style>
+</head>
+<body>
+
+<h1>Help &amp; FAQ</h1>
+<p class="subtitle">Answers to common questions and troubleshooting</p>
+
+<!-- ════════ GENERAL FAQ ════════ -->
+<h2>General</h2>
+
+<details class="faq">
+  <summary>What is BLE?</summary>
+  <div class="answer">
+    <p><strong>Bluetooth Low Energy</strong> (BLE) is a wireless protocol designed for low-power devices like fitness trackers, smart watches, temperature sensors, micro:bit, and IoT gadgets. It uses the 2.4 GHz radio band and has a typical range of 10–30 meters.</p>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>What is GATT?</summary>
+  <div class="answer">
+    <p><strong>Generic Attribute Profile</strong> — the way BLE organizes data. A device has <strong>Services</strong> (groups of related data) and each service has <strong>Characteristics</strong> (individual data values). Each characteristic has properties like Read, Write, and Notify.</p>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>What is a UUID?</summary>
+  <div class="answer">
+    <p>A unique identifier for services and characteristics. Standard UUIDs are 16-bit (e.g., <code>0x2A37</code> = Heart Rate Measurement). Custom devices use 128-bit UUIDs (e.g., <code>e95d0753-251d-470a-a062-fa1922dfa9a8</code> for micro:bit accelerometer).</p>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>What is RSSI?</summary>
+  <div class="answer">
+    <p><strong>Received Signal Strength Indicator</strong> — measures signal power in dBm (decibels relative to milliwatt). Values are always negative: closer to 0 = stronger signal. Typical ranges:</p>
+    <table>
+      <tr><th>RSSI</th><th>Signal</th><th>Distance</th></tr>
+      <tr><td>-30 to -50</td><td>Excellent</td><td>&lt; 1 meter</td></tr>
+      <tr><td>-50 to -70</td><td>Good</td><td>1–5 meters</td></tr>
+      <tr><td>-70 to -85</td><td>Fair</td><td>5–10 meters</td></tr>
+      <tr><td>-85 to -100</td><td>Weak</td><td>&gt; 10 meters</td></tr>
+    </table>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>What is SDR?</summary>
+  <div class="answer">
+    <p><strong>Software Defined Radio</strong> — a radio receiver where processing is done in software instead of hardware. The <strong>HackRF One</strong> is a popular SDR device that can receive 1 MHz to 6 GHz. This dashboard uses it to visualize the 2.4 GHz band where BLE and WiFi operate.</p>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>What are BLE channels?</summary>
+  <div class="answer">
+    <p>BLE uses 40 channels in the 2.4 GHz band:</p>
+    <ul>
+      <li><strong>3 advertising channels</strong> (37, 38, 39) — used for device discovery and broadcasting</li>
+      <li><strong>37 data channels</strong> (0–36) — used for connected communication with frequency hopping</li>
+    </ul>
+    <p>The advertising channels are placed between WiFi channels to reduce interference.</p>
+  </div>
+</details>
+
+<!-- ════════ SETUP FAQ ════════ -->
+<h2>Setup &amp; Installation</h2>
+
+<details class="faq">
+  <summary>Which browsers work?</summary>
+  <div class="answer">
+    <p><strong>Chrome</strong> and <strong>Edge</strong> support Web Bluetooth. Safari and Firefox do not. The page must be served from <code>http://localhost</code> or HTTPS.</p>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>How do I install on Linux / Raspberry Pi?</summary>
+  <div class="answer">
+    <pre><code>sudo apt update
+sudo apt install bluetooth bluez python3 python3-pip python3-venv
+cd ble-dashboard
+bash launch.sh     # choose Install (2), then Start (3)</code></pre>
+    <p>Add yourself to the bluetooth group for non-root access:</p>
+    <pre><code>sudo usermod -aG bluetooth $USER
+newgrp bluetooth</code></pre>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>How do I install on macOS?</summary>
+  <div class="answer">
+    <pre><code>brew install python3    # if not already installed
+cd ble-dashboard
+bash launch.sh          # choose Install (2), then Start (3)</code></pre>
+    <p>Accept the Bluetooth permission popup when Chrome asks for it.</p>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>What Python version do I need?</summary>
+  <div class="answer">
+    <p>Python <strong>3.10 or newer</strong>. Check with: <code>python3 --version</code></p>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>What are the Python dependencies?</summary>
+  <div class="answer">
+    <table>
+      <tr><th>Package</th><th>Purpose</th></tr>
+      <tr><td>FastAPI</td><td>Web framework (REST + WebSocket)</td></tr>
+      <tr><td>uvicorn</td><td>ASGI server</td></tr>
+      <tr><td>bleak</td><td>Cross-platform BLE library</td></tr>
+      <tr><td>aiofiles</td><td>Async file I/O for logging</td></tr>
+    </table>
+    <p>Install all at once: <code>pip install -r backend/requirements.txt</code></p>
+  </div>
+</details>
+
+<!-- ════════ TROUBLESHOOTING ════════ -->
+<h2>Troubleshooting</h2>
+
+<details class="faq">
+  <summary>Scan button doesn't work / no devices found</summary>
+  <div class="answer">
+    <p>Check these in order:</p>
+    <ol>
+      <li><strong>Browser:</strong> Use Chrome or Edge (not Safari/Firefox)</li>
+      <li><strong>URL:</strong> Must be <code>http://localhost:8000</code> (not 127.0.0.1)</li>
+      <li><strong>Bluetooth:</strong> Make sure your adapter is powered on</li>
+      <li><strong>Permission:</strong> Click "Allow" when the browser asks for Bluetooth access</li>
+      <li><strong>Distance:</strong> BLE devices must be within ~10 meters</li>
+    </ol>
+    <div class="tip">Use the <strong>🎲 Demo</strong> button to verify the dashboard works without real devices.</div>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>Server won't start / port already in use</summary>
+  <div class="answer">
+    <p>The default port is 8000. If it's already in use:</p>
+    <pre><code># Find what's using port 8000
+lsof -i :8000
+
+# Start on a different port
+BLE_PORT=8001 python backend/main.py
+
+# Or use the launcher
+bash launch.sh   # go to Configuration (9) → Change port</code></pre>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>Connection drops / GATT disconnect</summary>
+  <div class="answer">
+    <p>BLE connections can be fragile. Common causes:</p>
+    <ul>
+      <li>Device moved out of range</li>
+      <li>Device battery is low</li>
+      <li>Another app is connected to the same device</li>
+      <li>Bluetooth adapter is busy</li>
+    </ul>
+    <p>Enable <strong>Auto-reconnect</strong> in the Scanner to automatically reconnect on disconnect.</p>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>Can't write to a characteristic</summary>
+  <div class="answer">
+    <p>Check that the characteristic has the <strong>W</strong> (Write) property badge. Some characteristics are read-only. Also check:</p>
+    <ul>
+      <li>The device is still connected (green status dot)</li>
+      <li>Your value format is correct (hex pairs like <code>FF00</code> or plain text)</li>
+      <li>Some characteristics require specific byte lengths</li>
+    </ul>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>Bluetooth is rfkill-blocked (Linux)</summary>
+  <div class="answer">
+    <pre><code>sudo rfkill unblock bluetooth
+sudo systemctl restart bluetooth</code></pre>
+    <p>Verify with: <code>rfkill list bluetooth</code> — should show "Soft blocked: no"</p>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>HackRF not detected</summary>
+  <div class="answer">
+    <ol>
+      <li>Check USB connection: <code>lsusb | grep -i hackrf</code></li>
+      <li>Install tools: <code>sudo apt install hackrf</code> (Linux) or <code>brew install hackrf</code> (macOS)</li>
+      <li>Test: <code>hackrf_info</code> — should show firmware version</li>
+      <li>Linux permissions: <code>sudo chmod 666 /dev/bus/usb/...</code> or add udev rules</li>
+    </ol>
+    <div class="tip">You can always use <strong>Demo Mode</strong> without any hardware.</div>
+  </div>
+</details>
+
+<details class="faq">
+  <summary>Dashboard looks broken / old version cached</summary>
+  <div class="answer">
+    <p>Click the <strong>🔄</strong> button in the dashboard header to clear cache and reload. Or:</p>
+    <pre><code>Ctrl+Shift+R    (hard reload in Chrome)
+Cmd+Shift+R     (macOS)</code></pre>
+  </div>
+</details>
+
+<!-- ════════ API REFERENCE ════════ -->
+<h2>API Quick Reference</h2>
+
+<table>
+  <tr><th>Endpoint</th><th>Method</th><th>Description</th></tr>
+  <tr><td><code>/api/status</code></td><td>GET</td><td>Connection status, log format, version</td></tr>
+  <tr><td><code>/api/logs/csv</code></td><td>GET</td><td>Download CSV log file</td></tr>
+  <tr><td><code>/api/logs/json</code></td><td>GET</td><td>Download JSON Lines log file</td></tr>
+  <tr><td><code>/api/logs</code></td><td>DELETE</td><td>Clear all log files</td></tr>
+  <tr><td><code>/api/log_format/{fmt}</code></td><td>POST</td><td>Set format: csv, json, or both</td></tr>
+</table>
+
+<h2>WebSocket Messages</h2>
+
+<table>
+  <tr><th>Client → Server</th><th>Description</th></tr>
+  <tr><td><code>hello</code></td><td>Handshake, get server info</td></tr>
+  <tr><td><code>scan</code></td><td>Start scanning (duration, name_filter, rssi_min)</td></tr>
+  <tr><td><code>scan_stop</code></td><td>Stop scanning</td></tr>
+  <tr><td><code>connect</code></td><td>Connect to device (address, name)</td></tr>
+  <tr><td><code>disconnect</code></td><td>Disconnect current device</td></tr>
+  <tr><td><code>discover</code></td><td>Discover services</td></tr>
+  <tr><td><code>read</code></td><td>Read characteristic value</td></tr>
+  <tr><td><code>write</code></td><td>Write to characteristic (value as byte array)</td></tr>
+  <tr><td><code>subscribe</code></td><td>Enable notifications</td></tr>
+  <tr><td><code>unsubscribe</code></td><td>Disable notifications</td></tr>
+  <tr><td><code>sdr_start</code></td><td>Start SDR sweep (simulate: true/false)</td></tr>
+  <tr><td><code>sdr_stop</code></td><td>Stop SDR sweep</td></tr>
+</table>
+
+<!-- ════════ KEYBOARD SHORTCUTS ════════ -->
+<h2>Keyboard Shortcuts</h2>
+
+<table>
+  <tr><th>Key</th><th>Action</th></tr>
+  <tr><td><code>Ctrl + Shift + R</code></td><td>Hard reload (clear cache)</td></tr>
+  <tr><td><code>F12</code></td><td>Open browser developer tools</td></tr>
+  <tr><td><code>Ctrl + Shift + J</code></td><td>Open browser console (for debugging)</td></tr>
+</table>
+
+<!-- ════════ GLOSSARY ════════ -->
+<h2>Glossary</h2>
+
+<table>
+  <tr><th>Term</th><th>Definition</th></tr>
+  <tr><td>BLE</td><td>Bluetooth Low Energy — low-power wireless protocol</td></tr>
+  <tr><td>GATT</td><td>Generic Attribute Profile — BLE data organization</td></tr>
+  <tr><td>UUID</td><td>Universally Unique Identifier — names services and characteristics</td></tr>
+  <tr><td>RSSI</td><td>Received Signal Strength Indicator (in dBm)</td></tr>
+  <tr><td>MTU</td><td>Maximum Transmission Unit — max bytes per packet</td></tr>
+  <tr><td>SDR</td><td>Software Defined Radio</td></tr>
+  <tr><td>dBm</td><td>Decibels relative to milliwatt — unit for signal power</td></tr>
+  <tr><td>Advertising</td><td>BLE broadcast mode — devices announce themselves</td></tr>
+  <tr><td>Notify</td><td>BLE push updates — device sends data when it changes</td></tr>
+  <tr><td>Descriptor</td><td>Metadata attached to a characteristic (e.g., unit, range)</td></tr>
+  <tr><td>HackRF One</td><td>Open-source SDR hardware for radio spectrum analysis</td></tr>
+  <tr><td>Waterfall</td><td>Time-frequency display where color = signal strength</td></tr>
+  <tr><td>Frequency hopping</td><td>BLE data channels rapidly switch frequencies to avoid interference</td></tr>
+</table>
+
+<!-- ════════ LINKS ════════ -->
+<div class="nav-links">
+  <a href="start-here.html">Start Here</a>
+  <a href="howto.html">How-To Guides</a>
+  <a href="../frontend/index.html">Open Dashboard</a>
+</div>
+
+<div class="footer">BLE Dashboard v1.0 — Workshop-DIY — abourdim</div>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "ble-dashboard",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --reporter=verbose",
+    "test:coverage": "vitest run --coverage --reporter=verbose"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "*",
+    "jsdom": "*",
+    "vitest": "*"
+  },
+  "vitest": {
+    "environment": "jsdom",
+    "coverage": {
+      "provider": "v8",
+      "reporter": ["text", "html"],
+      "include": ["frontend/ble.js"]
+    }
+  }
+}

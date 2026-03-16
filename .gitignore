@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.coverage
+.venv/
+.env
+.DS_Store
+.server.pid
+server.log
+server*.log
+logs/
+node_modules/
+coverage_html/
+.claude/

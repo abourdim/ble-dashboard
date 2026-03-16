@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="robot">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BLE Dashboard — Workshop DIY</title>
+  <meta name="description" content="Bluetooth Low Energy Dashboard — scan, connect, read, write, monitor." />
+  <meta name="author" content="Workshop-DIY — abourdim" />
+  <meta property="og:title" content="BLE Dashboard — Workshop DIY" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#08091a" />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Righteous&family=Tajawal:wght@400;500;700&family=Bangers&family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="ble.css?v=7" />
+  <link rel="stylesheet" href="sdr.css?v=2" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ══════ SPLASH ══════ -->
+<div class="splash" id="splash" onclick="dismissSplash()">
+  <!-- Radar rings -->
+  <div class="splash-radar">
+    <div class="radar-ring ring-1"></div>
+    <div class="radar-ring ring-2"></div>
+    <div class="radar-ring ring-3"></div>
+    <div class="radar-sweep"></div>
+    <!-- BLE blips discovered by radar -->
+    <div class="radar-blip blip-1"></div>
+    <div class="radar-blip blip-2"></div>
+    <div class="radar-blip blip-3"></div>
+    <div class="radar-blip blip-4"></div>
+    <div class="radar-blip blip-5"></div>
+  </div>
+  <div class="splash-inner">
+    <div class="splash-logo" id="splashLogo"></div>
+    <div class="splash-title" id="splashTitle"></div>
+    <div class="splash-sub" data-i18n="subtitle">📡 scan · 🔗 connect · 📊 monitor</div>
+    <div class="splash-hint" data-i18n="splashHint">tap to skip</div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="deco-band top-band" aria-hidden="true"></div>
+  <div class="rows-container">
+
+    <!-- ══════ HEADER ══════ -->
+    <div class="header">
+      <div class="bismillah" aria-hidden="true">
+        <span class="bism-ornament">&#x2726;</span>
+        بِسْمِ ٱللَّٰهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+        <span class="bism-ornament">&#x2726;</span>
+      </div>
+      <div class="title-block">
+        <div class="logo-wrap" id="logoWrap"></div>
+        <div>
+          <h1 data-i18n="title">BLE Dashboard</h1>
+          <div class="subtitle" data-i18n="subtitle">📡 scan · 🔗 connect · 📊 monitor</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-buttons">
+          <button id="helpBtn"     class="btn-icon-only" aria-label="Help">❓</button>
+          <button id="settingsBtn" class="btn-icon-only" aria-label="Settings">⚙️</button>
+          <button id="logBtn"      class="btn-icon-only" aria-label="Activity Log">📜</button>
+          <button class="btn-icon-only" aria-label="Clear cache & reload" onclick="clearCacheReload()" title="Clear cache &amp; reload">🔄</button>
+        </div>
+        <div class="status-pill" id="statusPill">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText" data-i18n="disconnected">Disconnected</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ CARD 1 — SCANNER (open by default) ══════ -->
+    <details class="collapsible section-scanner" open>
+      <summary><span class="icon">📡</span> <span data-i18n="scanTitle">BLE Scanner</span></summary>
+      <div class="card section-scanner" id="mainCard">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><span class="icon">📡</span> <span data-i18n="scanTitle">BLE Scanner</span><span class="info-tip" title="Bluetooth Low Energy scanner discovers nearby BLE devices broadcasting advertisements">ⓘ</span> <span id="historyBadge" class="ble-history-badge" style="display:none"></span></div>
+            <div class="card-subtitle"><span data-i18n="scanDesc">Discover nearby Bluetooth Low Energy devices</span> <span class="version-tag">v1.0</span></div>
+          </div>
+          <div class="ble-scan-controls">
+            <button id="scanBtn"     class="button primary" onclick="bleScan()"><span class="btn-icon">🔍</span> <span data-i18n="scanStart">Scan</span></button>
+            <button id="stopScanBtn" class="button fire-btn" onclick="bleStopScan()" style="display:none"><span class="btn-icon">⛔</span> <span data-i18n="scanStop">Stop</span></button>
+            <button id="radarToggleBtn" class="button btn-sm" onclick="toggleRadarView()" title="Radar view">📡</button>
+            <button id="proxSoundBtn" class="button btn-sm" onclick="toggleProximitySound()" title="Proximity sound" style="display:none">🔊</button>
+            <button class="button btn-sm" onclick="exportDevicesCSV()" title="Export to CSV">📥</button>
+            <button class="button btn-sm" onclick="simulateDevices()" title="Demo mode">🎲</button>
+          </div>
+        </div>
+        <div class="control-section">
+          <div class="ble-filter-row">
+            <label class="sidebar-label" data-i18n="filterLabel">Filter by name</label>
+            <input id="deviceNameFilter" type="text" class="ble-input" placeholder="HC-05, sensor…" />
+            <label class="sidebar-label" data-i18n="rssiLabel">Min RSSI<span class="info-tip" title="Received Signal Strength Indicator — measures signal power in dBm. Closer to 0 = stronger signal">ⓘ</span></label>
+            <input id="rssiFilter" type="number" class="ble-input ble-input-sm" value="-90" min="-120" max="0" />
+            <label class="toggle-ctrl">
+              <input type="checkbox" id="autoReconnectChk" class="checkbox-ctrl" />
+              <span data-i18n="autoReconnect">Auto-reconnect</span>
+            </label>
+            <label class="toggle-ctrl">
+              <input type="checkbox" id="hideUnknownChk" class="checkbox-ctrl" />
+              <span data-i18n="hideUnknown">Hide unknown</span>
+            </label>
+          </div>
+        </div>
+        <div id="deviceList" class="ble-device-list">
+          <div class="ble-empty" data-i18n="noDevices">No devices found. Press Scan to start.</div>
+        </div>
+        <div id="radarView" class="ble-radar-view" style="display:none">
+          <div class="ble-radar-container">
+            <div class="ble-radar-circle">
+              <div class="ble-radar-ring ble-ring-1"></div>
+              <div class="ble-radar-ring ble-ring-2"></div>
+              <div class="ble-radar-ring ble-ring-3"></div>
+              <span class="ble-radar-label ble-label-1">~1m</span>
+              <span class="ble-radar-label ble-label-2">~5m</span>
+              <span class="ble-radar-label ble-label-3">~10m</span>
+              <div class="ble-radar-sweep"></div>
+              <div class="ble-radar-center">📱</div>
+              <div id="radarBlips"></div>
+            </div>
+          </div>
+          <div class="ble-radar-legend">
+            <span class="ble-legend-item"><span class="ble-legend-dot" style="background:#22c55e"></span> &lt;1m</span>
+            <span class="ble-legend-item"><span class="ble-legend-dot" style="background:#eab308"></span> ~5m</span>
+            <span class="ble-legend-item"><span class="ble-legend-dot" style="background:#f97316"></span> ~10m</span>
+            <span class="ble-legend-item"><span class="ble-legend-dot" style="background:#ef4444"></span> &gt;10m</span>
+          </div>
+          <div id="radarDetail" class="ble-radar-detail" style="display:none"></div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ══════ CARD 2 — CHARACTERISTICS (closed by default, opens on connect) ══════ -->
+    <details class="collapsible section-explorer" id="explorerDetails">
+      <summary><span class="icon">🔬</span> <span data-i18n="charTitle">Characteristics</span></summary>
+      <div class="card section-explorer section-explorer-hero">
+        <div class="card-header">
+          <div>
+            <div class="card-title" id="connectedDeviceName" data-i18n="noDevConn">No device connected</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="button btn-sm" id="discoverBtn" onclick="bleDiscoverServices()" disabled><span class="btn-icon">🔎</span> Discover</button>
+            <button class="button fire-btn btn-sm" id="disconnectBtn" onclick="bleDisconnect()" disabled><span class="btn-icon">🔌</span> Disconnect</button>
+          </div>
+        </div>
+        <div id="serviceTree" class="ble-service-tree">
+          <div class="ble-empty">Connect to a device to explore its services.</div>
+        </div>
+      </div>
+    </details>
+
+    <!-- Hidden elements kept for backward compat with JS -->
+    <select id="serviceSelect" class="sidebar-select" style="display:none"></select>
+    <select id="charSelect" class="sidebar-select" style="display:none"></select>
+
+    <!-- ══════ CARD 3 — MONITOR ══════ -->
+    <details class="collapsible section-monitor" open>
+      <summary><span class="icon">📊</span> <span data-i18n="monitorTitle">Monitor</span></summary>
+      <div class="card section-monitor">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="chartTitle">Real-time Chart</div>
+            <div class="card-subtitle" data-i18n="chartDesc">Live characteristic values over time</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="button btn-sm" onclick="clearChart()">🧹 <span data-i18n="clearChart">Clear</span></button>
+            <button class="button btn-sm" onclick="exportChartData()">💾 <span data-i18n="exportChart">Export</span></button>
+          </div>
+        </div>
+        <div class="control-section">
+          <div class="ble-chart-options">
+            <label class="sidebar-label" data-i18n="chartWindow">Window (pts)</label>
+            <input id="chartWindow" type="number" class="ble-input ble-input-sm" value="60" min="10" max="500" />
+            <label class="toggle-ctrl"><input type="checkbox" id="chartPause" class="checkbox-ctrl" /><span data-i18n="chartPause">Pause</span></label>
+            <label class="toggle-ctrl"><input type="checkbox" id="chartGrid"  class="checkbox-ctrl" checked /><span data-i18n="chartGrid">Grid</span></label>
+          </div>
+        </div>
+        <div class="ble-chart-wrap"><canvas id="bleChart"></canvas></div>
+        <div class="ble-stats-row">
+          <span class="ble-stat"><span data-i18n="statMin">Min</span>: <strong id="statMin">—</strong></span>
+          <span class="ble-stat"><span data-i18n="statMax">Max</span>: <strong id="statMax">—</strong></span>
+          <span class="ble-stat"><span data-i18n="statAvg">Avg</span>: <strong id="statAvg">—</strong></span>
+          <span class="ble-stat"><span data-i18n="statCount">Points</span>: <strong id="statCount">0</strong></span>
+        </div>
+      </div>
+    </details>
+
+    <!-- ══════ CARD 4 — MULTI-DEVICE ══════ -->
+    <details class="collapsible section-multi">
+      <summary><span class="icon">🔗</span> <span data-i18n="multiTitle">Connected Devices</span></summary>
+      <div class="card section-multi">
+        <div class="card-header">
+          <div>
+            <div class="card-title" data-i18n="multiSubTitle">Simultaneous connections</div>
+            <div class="card-subtitle" data-i18n="multiDesc">Up to 5 parallel BLE connections</div>
+          </div>
+        </div>
+        <div id="multiDeviceList" class="ble-multi-list">
+          <div class="ble-empty" data-i18n="noConnected">No active connections.</div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ══════ CARD 5 — SDR SPECTRUM ══════ -->
+    <details class="collapsible section-sdr">
+      <summary><span class="icon">📻</span> <span data-i18n="sdrTitle">SDR Spectrum (2.4 GHz)</span></summary>
+      <div class="card section-sdr">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📡 Radio Spectrum Analyzer</div>
+            <div class="card-subtitle">See invisible radio waves around you!</div>
+          </div>
+          <div class="sdr-controls">
+            <button id="sdrStartBtn" class="button primary" onclick="sdrStart()">▶️ Start</button>
+            <button id="sdrStopBtn" class="button fire-btn" onclick="sdrStop()" style="display:none">⏹ Stop</button>
+            <label class="toggle-ctrl"><input type="checkbox" id="sdrSimulateChk" class="checkbox-ctrl" checked /><span>Demo Mode</span></label>
+            <label class="toggle-ctrl"><input type="checkbox" id="sdrWifiOverlayChk" class="checkbox-ctrl" checked /><span>WiFi Overlay</span></label>
+          </div>
+        </div>
+
+        <!-- Waterfall Spectrogram -->
+        <div class="sdr-subsection">
+          <div class="sdr-sub-title">🌊 Waterfall Spectrogram</div>
+          <div class="sdr-waterfall-wrap"><canvas id="sdrWaterfall"></canvas></div>
+          <div class="sdr-freq-axis">
+            <span>2400</span><span>2420</span><span>2440</span><span>2460</span><span>2480</span><span>2500 MHz</span>
+          </div>
+          <div class="sdr-legend">
+            <span class="sdr-legend-label">-100 dBm</span>
+            <div class="sdr-legend-bar"></div>
+            <span class="sdr-legend-label">-30 dBm</span>
+          </div>
+        </div>
+
+        <!-- BLE Channel Activity -->
+        <div class="sdr-subsection">
+          <div class="sdr-sub-title">📊 BLE Channel Activity (40 channels)</div>
+          <div class="sdr-channels-wrap"><canvas id="sdrChannels"></canvas></div>
+        </div>
+
+        <!-- BLE vs WiFi Overlay -->
+        <div class="sdr-subsection" id="sdrOverlaySection">
+          <div class="sdr-sub-title">📶 BLE vs WiFi Comparison</div>
+          <div class="sdr-overlay-wrap"><canvas id="sdrOverlay"></canvas></div>
+        </div>
+      </div>
+    </details>
+
+  </div><!-- /rows-container -->
+
+  <!-- ══════ FOOTER ══════ -->
+  <footer class="app-footer">
+    <span class="footer-text">powered by <a href="https://workshop-diy.org" target="_blank" rel="noopener">workshop-diy.org</a></span>
+    <span class="hijri-date" id="hijriDate"></span>
+  </footer>
+  <div class="deco-band bottom-band" aria-hidden="true"></div>
+</div>
+
+<canvas id="matrixCanvas" class="matrix-canvas"></canvas>
+<div id="debugPanel" class="debug-panel"><span id="debugFps">0 FPS</span><span id="debugMem">0 MB</span></div>
+
+<!-- ══════ LEFT PANEL — Help ══════ -->
+<div class="sidebar-overlay" id="helpOverlay"></div>
+<aside class="sidebar sidebar-left" id="helpPanel" role="dialog" aria-modal="true" aria-label="Help">
+  <div class="sidebar-header">
+    <span class="sidebar-title" data-i18n="help">❓ Help</span>
+    <button id="helpCloseBtn" class="btn-icon-only" aria-label="Close">✕</button>
+  </div>
+  <div class="help-tabs">
+    <button class="help-tab active" data-tab="faq"   data-i18n="faq">FAQ</button>
+    <button class="help-tab"        data-tab="howto" data-i18n="howto">How-To</button>
+    <button class="help-tab"        data-tab="wiki"  data-i18n="wiki">Wiki</button>
+  </div>
+  <div class="sidebar-body">
+    <div class="help-content active" id="helpFaq">
+      <details class="help-item"><summary data-i18n="faq_q1">What is BLE?</summary><p data-i18n="faq_a1">Bluetooth Low Energy — wireless protocol for sensors, wearables, IoT. Low power, short range.</p></details>
+      <details class="help-item"><summary data-i18n="faq_q2">Why can't I scan?</summary><p data-i18n="faq_a2">Chrome or Edge required. Must be HTTPS or localhost. Accept Bluetooth permission.</p></details>
+      <details class="help-item"><summary data-i18n="faq_q3">What is a characteristic?</summary><p data-i18n="faq_a3">A data slot in a BLE service. You can read it, write to it, or subscribe to notifications.</p></details>
+      <details class="help-item"><summary data-i18n="faq_q4">Is data logged?</summary><p data-i18n="faq_a4">Yes — Python backend logs all events to /logs/ as CSV and JSON Lines automatically.</p></details>
+      <details class="help-item"><summary data-i18n="faq_q5">How to start backend?</summary><p data-i18n="faq_a5">cd backend &amp;&amp; pip install -r requirements.txt &amp;&amp; python main.py</p></details>
+    </div>
+    <div class="help-content" id="helpHowto">
+      <div class="help-step"><span class="help-step-num">1</span><p data-i18n="howto_1">Start the backend: cd backend &amp;&amp; python main.py</p></div>
+      <div class="help-step"><span class="help-step-num">2</span><p data-i18n="howto_2">Open http://localhost:8000 in Chrome or Edge.</p></div>
+      <div class="help-step"><span class="help-step-num">3</span><p data-i18n="howto_3">Click Scan. Optionally filter by name or RSSI.</p></div>
+      <div class="help-step"><span class="help-step-num">4</span><p data-i18n="howto_4">Click Connect on a device, then Discover for its services.</p></div>
+      <div class="help-step"><span class="help-step-num">5</span><p data-i18n="howto_5">Select service + characteristic → Read / Write / Subscribe.</p></div>
+      <div class="help-step"><span class="help-step-num">6</span><p data-i18n="howto_6">Watch the real-time chart. Export logs from Settings.</p></div>
+    </div>
+    <div class="help-content" id="helpWiki">
+      <div class="wiki-entry"><h3 data-i18n="wiki_ble_title">📡 BLE Protocol</h3><p data-i18n="wiki_ble">GATT-based. Services group Characteristics with properties: read, write, notify, indicate.</p></div>
+      <div class="wiki-entry"><h3 data-i18n="wiki_uuid_title">🔑 UUIDs</h3><p data-i18n="wiki_uuid">16-bit standard (e.g. 0x2A37 = Heart Rate) or 128-bit custom. Both supported.</p></div>
+      <div class="wiki-entry"><h3 data-i18n="wiki_backend_title">🐍 Backend</h3><p data-i18n="wiki_backend">FastAPI + bleak. WS: ws://localhost:8000/ws. REST: /api/. Logs: /logs/. Linux · macOS · RPi.</p></div>
+      <div class="wiki-entry"><h3 data-i18n="wiki_log_title">📜 Log</h3><p data-i18n="wiki_log">TX (blue) = sent, RX (cyan) = received. Filter by type. Export as .txt.</p></div>
+    </div>
+  </div>
+  <div class="sidebar-footer"><span>BLE Dashboard</span><span class="badge"><strong>v1.0</strong></span></div>
+</aside>
+
+<!-- ══════ RIGHT PANEL — Settings ══════ -->
+<div class="sidebar-overlay" id="settingsOverlay"></div>
+<aside class="sidebar" id="settingsPanel" role="dialog" aria-modal="true" aria-label="Settings">
+  <div class="sidebar-header">
+    <span class="sidebar-title" data-i18n="settings">⚙️ Settings</span>
+    <button id="settingsCloseBtn" class="btn-icon-only" aria-label="Close">✕</button>
+  </div>
+  <div class="sidebar-body">
+    <div class="sidebar-group">
+      <label class="sidebar-label" data-i18n="language">Language</label>
+      <select id="langSelect" class="sidebar-select">
+        <option value="en">🇬🇧 EN</option>
+        <option value="fr">🇫🇷 FR</option>
+        <option value="ar">🇩🇿 عربي</option>
+      </select>
+    </div>
+    <div class="sidebar-group">
+      <label class="sidebar-label" data-i18n="theme">Theme</label>
+      <select id="themeSelect" class="sidebar-select">
+        <option value="mosque-gold" data-i18n-opt="t_mosque">Mosque</option>
+        <option value="zellige"     data-i18n-opt="t_zellige">Zellige</option>
+        <option value="andalus"     data-i18n-opt="t_andalus">Andalus</option>
+        <option value="riad"        data-i18n-opt="t_riad">Riad</option>
+        <option value="medina"      data-i18n-opt="t_medina">Medina</option>
+        <option value="space"       data-i18n-opt="t_space">Space</option>
+        <option value="jungle"      data-i18n-opt="t_jungle">Jungle</option>
+        <option value="robot"       data-i18n-opt="t_robot">Robot</option>
+      </select>
+    </div>
+    <div class="sidebar-group">
+      <label class="toggle-ctrl"><input type="checkbox" id="soundToggle" class="checkbox-ctrl" /><span data-i18n="soundEffects">🔊 Sound effects</span></label>
+    </div>
+    <div class="sidebar-group">
+      <label class="sidebar-label" data-i18n="backendURL">Backend URL</label>
+      <input id="backendURL" type="text" class="ble-input" value="ws://localhost:8000/ws" />
+    </div>
+    <div class="sidebar-group">
+      <label class="sidebar-label" data-i18n="logFormat">Log format</label>
+      <select id="logFormatSel" class="sidebar-select">
+        <option value="both"  data-i18n="logBoth">CSV + JSON</option>
+        <option value="csv">CSV only</option>
+        <option value="json">JSON only</option>
+      </select>
+    </div>
+    <div class="sidebar-group">
+      <button class="btn-sm" style="width:100%" onclick="exportLogsFromBackend()"><span class="btn-icon">💾</span> <span data-i18n="exportLogs">Export logs from backend</span></button>
+    </div>
+    <div class="sidebar-group">
+      <button id="whisperBtn"   class="btn-sm" style="width:100%"><span class="btn-icon">🎤</span> <span data-i18n="whisperMode">Whisper mode</span></button>
+    </div>
+    <div class="sidebar-group">
+      <button id="breathingBtn" class="btn-sm" style="width:100%"><span class="btn-icon">🫁</span> <span data-i18n="breathingGuide">Breathing guide</span></button>
+      <div class="dhikr-display" id="dhikrDisplay" style="display:none">
+        <span class="dhikr-label">سبحان الله</span>
+        <span class="dhikr-count" id="dhikrCounter">0</span>
+        <button id="dhikrBtn" class="btn-sm primary"><span data-i18n="dhikrTap">Tap</span></button>
+      </div>
+    </div>
+    <div class="sidebar-group">
+      <button id="musicBtn" class="btn-sm" style="width:100%"><span class="btn-icon">🎵</span> <span data-i18n="musicMode">Music reactive</span></button>
+    </div>
+  </div>
+  <div class="sidebar-footer"><span>BLE Dashboard</span><span class="badge"><strong>v1.0</strong></span></div>
+</aside>
+
+<!-- ══════ RIGHT PANEL — Activity Log (docked) ══════ -->
+<aside class="sidebar" id="logPanel" aria-label="Activity Log">
+  <div class="resize-handle" id="logResizeHandle"></div>
+  <div class="sidebar-header">
+    <span class="sidebar-title" data-i18n="activityLog">📜 Activity Log</span>
+    <div class="log-controls">
+      <button id="clearLogBtn" class="btn-sm"><span class="btn-icon">🧹</span><span data-i18n="clear">Clear</span></button>
+      <button id="copyLogBtn"  class="btn-sm"><span class="btn-icon">📋</span><span data-i18n="copy">Copy</span></button>
+      <button id="exportLogBtn" class="btn-sm"><span class="btn-icon">💾</span><span data-i18n="export">Export</span></button>
+      <button id="logCloseBtn" class="btn-icon-only" aria-label="Close">✕</button>
+    </div>
+  </div>
+  <div class="log-filters" id="logFilters">
+    <button class="log-filter active" data-filter="all"     data-i18n="filterAll">All</button>
+    <button class="log-filter"        data-filter="info">Info</button>
+    <button class="log-filter"        data-filter="success">✓</button>
+    <button class="log-filter"        data-filter="error">✗</button>
+    <button class="log-filter"        data-filter="tx">TX</button>
+    <button class="log-filter"        data-filter="rx">RX</button>
+  </div>
+  <div class="sidebar-body log-body">
+    <div class="log" id="logContainer" aria-live="polite"></div>
+  </div>
+  <div class="sidebar-footer"><span data-i18n="eventsMsg">Events &amp; messages</span><span class="badge"><strong>v1.0</strong></span></div>
+</aside>
+
+<!-- Toast -->
+<div id="toastIndicator" class="toast-indicator">
+  <div class="toast-inner">
+    <div class="spinner"></div>
+    <div id="toastMessage" class="toast-text">Working…</div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script src="ble.js?v=5"></script>
+<script src="sdr.js?v=1"></script>
+</body>
+</html>

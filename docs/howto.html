@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BLE Dashboard — How-To Guides</title>
+  <style>
+    :root {
+      --bg: #0a0b1e; --panel: #111333; --border: rgba(255,255,255,.08);
+      --text: #e0e4f0; --dim: #7a8aaa; --accent: #38bdf8;
+      --green: #22c55e; --yellow: #eab308; --red: #ef4444;
+      --indigo: #818cf8; --teal: #2dd4bf; --purple: #a78bfa;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.7;
+      max-width: 860px; margin: 0 auto; padding: 32px 20px;
+    }
+    h1 { font-size: 2rem; color: var(--accent); text-align: center; margin-bottom: 8px; }
+    .subtitle { text-align: center; color: var(--dim); margin-bottom: 40px; font-size: .95rem; }
+    h2 {
+      font-size: 1.2rem; color: var(--indigo); margin: 32px 0 12px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    h3 { font-size: 1rem; color: var(--teal); margin: 16px 0 8px; }
+    p, li { margin-bottom: 8px; }
+    ul, ol { padding-left: 24px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .tutorial {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 24px; margin: 16px 0;
+    }
+    .tutorial h3 { margin-top: 0; }
+
+    code {
+      font-family: 'Fira Code', 'Consolas', monospace;
+      background: rgba(56,189,248,.1); color: var(--accent);
+      padding: 2px 8px; border-radius: 4px; font-size: .88rem;
+    }
+    pre {
+      background: #0d0f2a; border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px 20px; overflow-x: auto;
+      margin: 12px 0; font-size: .85rem; line-height: 1.6;
+    }
+    pre code { background: none; padding: 0; }
+
+    .tip {
+      background: rgba(34,197,94,.08); border-left: 3px solid var(--green);
+      border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: .88rem;
+    }
+    .warn {
+      background: rgba(234,179,8,.08); border-left: 3px solid var(--yellow);
+      border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: .88rem;
+    }
+
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 4px;
+      font-size: .75rem; font-weight: 700; text-transform: uppercase;
+    }
+    .badge-easy { background: rgba(34,197,94,.15); color: var(--green); }
+    .badge-medium { background: rgba(234,179,8,.15); color: var(--yellow); }
+    .badge-advanced { background: rgba(129,140,248,.15); color: var(--indigo); }
+
+    .toc {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px 24px; margin: 20px 0;
+    }
+    .toc ul { list-style: none; padding: 0; }
+    .toc li { padding: 4px 0; }
+    .toc a { color: var(--text); }
+    .toc a:hover { color: var(--accent); }
+
+    .nav-links {
+      display: flex; gap: 16px; justify-content: center;
+      margin: 40px 0 20px; flex-wrap: wrap;
+    }
+    .nav-links a {
+      background: var(--panel); border: 1px solid var(--border);
+      padding: 10px 20px; border-radius: 8px; font-weight: 600;
+      transition: border-color .2s;
+    }
+    .nav-links a:hover { border-color: var(--accent); text-decoration: none; }
+
+    .footer { text-align: center; color: var(--dim); margin-top: 48px; font-size: .8rem; }
+  </style>
+</head>
+<body>
+
+<h1>How-To Guides</h1>
+<p class="subtitle">Step-by-step tutorials for every feature</p>
+
+<!-- ════════ TABLE OF CONTENTS ════════ -->
+<div class="toc">
+  <strong>Contents</strong>
+  <ul>
+    <li><a href="#scan">1. Scan for BLE Devices</a> <span class="badge badge-easy">Easy</span></li>
+    <li><a href="#connect">2. Connect and Explore Services</a> <span class="badge badge-easy">Easy</span></li>
+    <li><a href="#read-write">3. Read and Write Characteristics</a> <span class="badge badge-easy">Easy</span></li>
+    <li><a href="#subscribe">4. Subscribe to Notifications</a> <span class="badge badge-easy">Easy</span></li>
+    <li><a href="#chart">5. Use the Real-time Chart</a> <span class="badge badge-easy">Easy</span></li>
+    <li><a href="#radar">6. Use Radar View</a> <span class="badge badge-easy">Easy</span></li>
+    <li><a href="#packet">7. Packet Analyzer</a> <span class="badge badge-medium">Medium</span></li>
+    <li><a href="#macro">8. Record and Play Macros</a> <span class="badge badge-medium">Medium</span></li>
+    <li><a href="#sdr">9. SDR Spectrum Analyzer</a> <span class="badge badge-medium">Medium</span></li>
+    <li><a href="#multi">10. Multi-device Connections</a> <span class="badge badge-medium">Medium</span></li>
+    <li><a href="#debug">11. Debug and Export</a> <span class="badge badge-advanced">Advanced</span></li>
+    <li><a href="#rpi">12. Set Up on Raspberry Pi</a> <span class="badge badge-advanced">Advanced</span></li>
+    <li><a href="#hackrf">13. Use Real HackRF One Hardware</a> <span class="badge badge-advanced">Advanced</span></li>
+  </ul>
+</div>
+
+<!-- ════════ TUTORIALS ════════ -->
+
+<h2 id="scan">1. Scan for BLE Devices</h2>
+<div class="tutorial">
+  <ol>
+    <li>Open the dashboard at <code>http://localhost:8000</code></li>
+    <li>The <strong>BLE Scanner</strong> section is open by default at the top</li>
+    <li>Click the <strong>Scan</strong> button</li>
+    <li>Your browser asks for Bluetooth permission — click <strong>Allow</strong></li>
+    <li>Devices appear in the list with name, signal strength bars, and RSSI value</li>
+  </ol>
+  <h3>Filter devices</h3>
+  <ul>
+    <li><strong>Name filter:</strong> Type part of a device name (e.g., "HC-05" or "sensor")</li>
+    <li><strong>Min RSSI:</strong> Set to -60 to only show strong (close) signals</li>
+    <li><strong>Hide unknown:</strong> Check this to hide devices without a name</li>
+  </ul>
+  <div class="tip">
+    <strong>No devices nearby?</strong> Click the <strong>🎲</strong> button for demo mode with 6 simulated devices.
+  </div>
+</div>
+
+<h2 id="connect">2. Connect and Explore Services</h2>
+<div class="tutorial">
+  <ol>
+    <li>After scanning, click <strong>Connect</strong> on any device</li>
+    <li>The <strong>Characteristics</strong> panel opens automatically</li>
+    <li>Click <strong>Discover</strong> to load all services and characteristics</li>
+    <li>Services appear as expandable groups with color-coded headers</li>
+    <li>Each characteristic shows its UUID and property badges: <strong>R</strong> (read), <strong>W</strong> (write), <strong>N</strong> (notify)</li>
+  </ol>
+  <div class="tip">
+    Known characteristics are automatically decoded: Battery Level shows as "85%", Heart Rate as "72 BPM", Temperature as "23.5°C", etc.
+  </div>
+</div>
+
+<h2 id="read-write">3. Read and Write Characteristics</h2>
+<div class="tutorial">
+  <h3>Reading</h3>
+  <ol>
+    <li>Find a characteristic with the <strong>R</strong> badge</li>
+    <li>Click the <strong>R</strong> button next to it</li>
+    <li>The value appears in hex, UTF-8 text, and integer formats</li>
+  </ol>
+  <h3>Writing</h3>
+  <ol>
+    <li>Find a characteristic with the <strong>W</strong> badge</li>
+    <li>Click the <strong>W</strong> button</li>
+    <li>Type your value — the dashboard auto-detects hex (e.g., <code>FF00</code>) vs text</li>
+    <li>Click Send</li>
+  </ol>
+  <div class="tip">
+    Use <strong>Read All</strong> to read every readable characteristic at once.
+  </div>
+</div>
+
+<h2 id="subscribe">4. Subscribe to Notifications</h2>
+<div class="tutorial">
+  <ol>
+    <li>Find a characteristic with the <strong>N</strong> badge</li>
+    <li>Click the <strong>N</strong> button to subscribe</li>
+    <li>Values stream in real-time and appear in the chart below</li>
+    <li>Click <strong>N</strong> again to unsubscribe</li>
+  </ol>
+  <h3>Watch Mode</h3>
+  <p>Click <strong>Watch</strong> to automatically subscribe to ALL notifiable characteristics and poll all readable ones. Great for getting a full picture of a device.</p>
+</div>
+
+<h2 id="chart">5. Use the Real-time Chart</h2>
+<div class="tutorial">
+  <ol>
+    <li>Subscribe to a characteristic that sends numeric data</li>
+    <li>The chart auto-creates a line for each data series</li>
+    <li>If data arrives as <code>KEY:VALUE</code> format (e.g., <code>temp:23.5</code>), each key gets its own line</li>
+  </ol>
+  <h3>Controls</h3>
+  <ul>
+    <li><strong>Window:</strong> How many data points to show (default 60)</li>
+    <li><strong>Pause:</strong> Freeze the chart while data keeps coming</li>
+    <li><strong>Grid:</strong> Toggle background grid lines</li>
+    <li><strong>Export:</strong> Download chart data as CSV</li>
+  </ul>
+</div>
+
+<h2 id="radar">6. Use Radar View</h2>
+<div class="tutorial">
+  <ol>
+    <li>Start a scan</li>
+    <li>Click the <strong>📡</strong> radar toggle button</li>
+    <li>Devices appear as blips on concentric rings based on estimated distance</li>
+    <li>Color indicates proximity: green (&lt;1m), yellow (~5m), orange (~10m), red (&gt;10m)</li>
+    <li>Click a blip to see device details</li>
+  </ol>
+</div>
+
+<h2 id="packet">7. Packet Analyzer</h2>
+<div class="tutorial">
+  <h3>Opening the analyzer</h3>
+  <p>The packet analyzer is built into the service explorer. Every BLE operation (read, write, notify) is captured automatically.</p>
+  <h3>Filtering packets</h3>
+  <ul>
+    <li>Type in the filter box to search by text</li>
+    <li>Use field queries: <code>type:notify</code>, <code>uuid:e95d</code>, <code>len>5</code></li>
+  </ul>
+  <h3>Hex dump</h3>
+  <p>Click any packet to see its detail tree (Frame → BLE → GATT → Value) and hex dump with ASCII sidebar.</p>
+  <div class="tip">Double-click a packet to mark it. Use "Follow" to filter to just one characteristic's packets.</div>
+</div>
+
+<h2 id="macro">8. Record and Play Macros</h2>
+<div class="tutorial">
+  <ol>
+    <li>In the nRF Tools section, find the <strong>Macro Recorder</strong></li>
+    <li>Click <strong>Record</strong></li>
+    <li>Perform BLE operations (read, write, subscribe)</li>
+    <li>Click <strong>Stop</strong></li>
+    <li>Click <strong>Play</strong> to replay the same sequence</li>
+  </ol>
+  <p>You can <strong>Save</strong> macros for later and <strong>Export</strong> them as JSON files.</p>
+</div>
+
+<h2 id="sdr">9. SDR Spectrum Analyzer</h2>
+<div class="tutorial">
+  <ol>
+    <li>Open the <strong>SDR Spectrum (2.4 GHz)</strong> section</li>
+    <li>Make sure <strong>Demo Mode</strong> is checked (unless you have a HackRF One)</li>
+    <li>Click <strong>Start</strong></li>
+  </ol>
+  <h3>What you see</h3>
+  <ul>
+    <li><strong>Waterfall:</strong> Time flows downward. Colors show signal strength (blue = weak, yellow = strong)</li>
+    <li><strong>Channel Bars:</strong> 40 BLE channels. Red bars = advertising channels (37, 38, 39)</li>
+    <li><strong>BLE vs WiFi:</strong> Comparison chart showing how WiFi channels overlap with BLE</li>
+  </ul>
+  <div class="tip">
+    Check the <strong>WiFi Overlay</strong> toggle to see WiFi channel regions highlighted on the charts.
+  </div>
+</div>
+
+<h2 id="multi">10. Multi-device Connections</h2>
+<div class="tutorial">
+  <ol>
+    <li>Connect to a first device normally</li>
+    <li>Scan again and connect to another device</li>
+    <li>Open the <strong>Connected Devices</strong> section to see all active connections</li>
+    <li>Up to 5 simultaneous BLE connections are supported</li>
+  </ol>
+</div>
+
+<h2 id="debug">11. Debug and Export</h2>
+<div class="tutorial">
+  <h3>Connection Timeline</h3>
+  <p>Visual history of all events (connect, disconnect, read, write, error) with timestamps and color-coded dots.</p>
+  <h3>Read Latency Report</h3>
+  <p>See how long each read operation takes, with bar visualization. Useful for identifying slow characteristics.</p>
+  <h3>Debug Snapshot</h3>
+  <p>One-click JSON export of the full dashboard state: timeline, data rates, latency, services, errors. Share with others for troubleshooting.</p>
+  <h3>Log Export</h3>
+  <p>From Settings, click <strong>Export logs from backend</strong> to download CSV and JSONL log files.</p>
+</div>
+
+<h2 id="rpi">12. Set Up on Raspberry Pi</h2>
+<div class="tutorial">
+  <ol>
+    <li>Install system packages:
+      <pre><code>sudo apt update
+sudo apt install bluetooth bluez python3 python3-pip python3-venv</code></pre>
+    </li>
+    <li>Add your user to the bluetooth group:
+      <pre><code>sudo usermod -aG bluetooth $USER
+newgrp bluetooth</code></pre>
+    </li>
+    <li>Clone the project and run the launcher:
+      <pre><code>cd ble-dashboard
+bash launch.sh</code></pre>
+    </li>
+    <li>Choose Install (2), then Start (3)</li>
+    <li>Open <code>http://raspberry-pi-ip:8000</code> from another device on the same network</li>
+  </ol>
+  <div class="warn">
+    If Bluetooth is blocked: <code>sudo rfkill unblock bluetooth</code>
+  </div>
+</div>
+
+<h2 id="hackrf">13. Use Real HackRF One Hardware</h2>
+<div class="tutorial">
+  <ol>
+    <li>Install HackRF tools:
+      <pre><code># Linux / Raspberry Pi
+sudo apt install hackrf
+
+# macOS
+brew install hackrf</code></pre>
+    </li>
+    <li>Plug in your HackRF One USB device</li>
+    <li>Verify it's detected: <code>hackrf_info</code></li>
+    <li>In the SDR section, <strong>uncheck</strong> Demo Mode</li>
+    <li>Click <strong>Start</strong> — the dashboard runs <code>hackrf_sweep</code> to capture real spectrum data</li>
+  </ol>
+  <div class="tip">
+    The dashboard sweeps 2400–2500 MHz (the BLE/WiFi band) and maps all 40 BLE channels to their exact frequencies.
+  </div>
+</div>
+
+<!-- ════════ LINKS ════════ -->
+<div class="nav-links">
+  <a href="start-here.html">Start Here</a>
+  <a href="help.html">FAQ &amp; Troubleshooting</a>
+  <a href="../frontend/index.html">Open Dashboard</a>
+</div>
+
+<div class="footer">BLE Dashboard v1.0 — Workshop-DIY — abourdim</div>
+
+</body>
+</html>

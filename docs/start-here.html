@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BLE Dashboard — Start Here</title>
+  <style>
+    :root {
+      --bg: #0a0b1e; --panel: #111333; --border: rgba(255,255,255,.08);
+      --text: #e0e4f0; --dim: #7a8aaa; --accent: #38bdf8;
+      --green: #22c55e; --yellow: #eab308; --red: #ef4444;
+      --indigo: #818cf8; --teal: #2dd4bf; --purple: #a78bfa;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.7;
+      max-width: 860px; margin: 0 auto; padding: 32px 20px;
+    }
+    h1 {
+      font-family: 'Orbitron', monospace, sans-serif;
+      font-size: 2rem; color: var(--accent); text-align: center;
+      margin-bottom: 8px; letter-spacing: .04em;
+    }
+    .subtitle { text-align: center; color: var(--dim); margin-bottom: 40px; font-size: .95rem; }
+    h2 {
+      font-size: 1.3rem; color: var(--indigo); margin: 36px 0 16px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    h3 { font-size: 1rem; color: var(--teal); margin: 20px 0 8px; }
+    p, li { color: var(--text); margin-bottom: 10px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .step-card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 24px; margin: 16px 0;
+      border-left: 4px solid var(--accent); position: relative;
+    }
+    .step-num {
+      position: absolute; top: -12px; left: 16px;
+      background: var(--accent); color: #000; font-weight: 800;
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem;
+    }
+    .step-card h3 { margin-top: 4px; color: var(--accent); }
+
+    code, .cmd {
+      font-family: 'Fira Code', 'Consolas', monospace;
+      background: rgba(56,189,248,.1); color: var(--accent);
+      padding: 2px 8px; border-radius: 4px; font-size: .88rem;
+    }
+    pre {
+      background: #0d0f2a; border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px 20px; overflow-x: auto;
+      margin: 12px 0; font-size: .85rem; line-height: 1.6;
+    }
+    pre code { background: none; padding: 0; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .req-card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px; text-align: center;
+    }
+    .req-icon { font-size: 2rem; margin-bottom: 8px; }
+    .req-title { font-weight: 700; color: var(--text); }
+    .req-desc { font-size: .82rem; color: var(--dim); }
+
+    .tip {
+      background: rgba(34,197,94,.08); border-left: 3px solid var(--green);
+      border-radius: 6px; padding: 12px 16px; margin: 12px 0;
+      font-size: .88rem;
+    }
+    .warn {
+      background: rgba(234,179,8,.08); border-left: 3px solid var(--yellow);
+      border-radius: 6px; padding: 12px 16px; margin: 12px 0;
+      font-size: .88rem;
+    }
+
+    .nav-links {
+      display: flex; gap: 16px; justify-content: center;
+      margin: 40px 0 20px; flex-wrap: wrap;
+    }
+    .nav-links a {
+      background: var(--panel); border: 1px solid var(--border);
+      padding: 10px 20px; border-radius: 8px; font-weight: 600;
+      transition: border-color .2s;
+    }
+    .nav-links a:hover { border-color: var(--accent); text-decoration: none; }
+
+    .footer { text-align: center; color: var(--dim); margin-top: 48px; font-size: .8rem; }
+  </style>
+</head>
+<body>
+
+<h1>BLE Dashboard — Start Here</h1>
+<p class="subtitle">Your guide to getting up and running in 5 minutes</p>
+
+<!-- ════════ REQUIREMENTS ════════ -->
+<h2>What You Need</h2>
+
+<div class="grid-2">
+  <div class="req-card">
+    <div class="req-icon">💻</div>
+    <div class="req-title">Computer</div>
+    <div class="req-desc">Linux, macOS, Raspberry Pi, or Windows</div>
+  </div>
+  <div class="req-card">
+    <div class="req-icon">🐍</div>
+    <div class="req-title">Python 3.10+</div>
+    <div class="req-desc">Backend server runs on Python</div>
+  </div>
+  <div class="req-card">
+    <div class="req-icon">📶</div>
+    <div class="req-title">Bluetooth Adapter</div>
+    <div class="req-desc">Built-in or USB BLE 4.0+ dongle</div>
+  </div>
+  <div class="req-card">
+    <div class="req-icon">🌐</div>
+    <div class="req-title">Chrome or Edge</div>
+    <div class="req-desc">Web Bluetooth requires these browsers</div>
+  </div>
+</div>
+
+<div class="tip">
+  <strong>Optional:</strong> A HackRF One SDR dongle for real spectrum analysis. Without it, use the built-in Demo Mode!
+</div>
+
+<!-- ════════ INSTALLATION ════════ -->
+<h2>Installation — Step by Step</h2>
+
+<div class="step-card">
+  <div class="step-num">1</div>
+  <h3>Download the project</h3>
+  <p>Clone or download the BLE Dashboard folder to your computer.</p>
+  <pre><code>git clone https://github.com/your-repo/ble-dashboard.git
+cd ble-dashboard</code></pre>
+</div>
+
+<div class="step-card">
+  <div class="step-num">2</div>
+  <h3>Run the launcher</h3>
+  <p>The launcher is an interactive menu that handles everything for you.</p>
+  <pre><code>bash launch.sh</code></pre>
+  <p>This works on Linux, macOS, and Raspberry Pi. It will detect your system automatically.</p>
+</div>
+
+<div class="step-card">
+  <div class="step-num">3</div>
+  <h3>Install dependencies</h3>
+  <p>From the launcher menu, press <code>2</code> (Install / update dependencies).</p>
+  <p>This creates a Python virtual environment and installs FastAPI, bleak, and other packages.</p>
+  <div class="tip">On Linux/Raspberry Pi, you may also need: <code>sudo apt install bluetooth bluez</code></div>
+</div>
+
+<div class="step-card">
+  <div class="step-num">4</div>
+  <h3>Start the server</h3>
+  <p>From the launcher menu, press <code>3</code> (Start server).</p>
+  <p>The server starts on <code>http://localhost:8000</code> by default.</p>
+  <pre><code># Or start manually:
+cd backend
+pip install -r requirements.txt
+python main.py</code></pre>
+</div>
+
+<div class="step-card">
+  <div class="step-num">5</div>
+  <h3>Open the dashboard</h3>
+  <p>Press <code>5</code> (Open web dashboard) or open <a href="http://localhost:8000">http://localhost:8000</a> in Chrome or Edge.</p>
+  <div class="warn">
+    <strong>Important:</strong> Safari and Firefox do NOT support Web Bluetooth. Use Chrome or Edge.
+  </div>
+</div>
+
+<!-- ════════ FIRST SCAN ════════ -->
+<h2>Your First BLE Scan</h2>
+
+<div class="step-card">
+  <div class="step-num">1</div>
+  <h3>Click "Scan"</h3>
+  <p>The scanner searches for nearby Bluetooth devices. You'll see them appear in the device list with signal strength bars.</p>
+</div>
+
+<div class="step-card">
+  <div class="step-num">2</div>
+  <h3>Click "Connect" on a device</h3>
+  <p>The Characteristics panel opens automatically. Click "Discover" to see all services and characteristics.</p>
+</div>
+
+<div class="step-card">
+  <div class="step-num">3</div>
+  <h3>Read, Write, Subscribe</h3>
+  <p>Each characteristic shows badges for what you can do: <strong>R</strong> (read), <strong>W</strong> (write), <strong>N</strong> (notify/subscribe).</p>
+  <p>Click Subscribe to watch live data stream into the chart!</p>
+</div>
+
+<div class="tip">
+  <strong>No BLE device handy?</strong> Click the <code>🎲</code> button for demo mode — it simulates 6 devices so you can explore the interface.
+</div>
+
+<!-- ════════ WHAT'S INSIDE ════════ -->
+<h2>What's Inside the Dashboard</h2>
+
+<div class="grid-2">
+  <div class="req-card">
+    <div class="req-icon">📡</div>
+    <div class="req-title">BLE Scanner</div>
+    <div class="req-desc">Find devices, filter by name/signal, radar view, CSV export</div>
+  </div>
+  <div class="req-card">
+    <div class="req-icon">🔬</div>
+    <div class="req-title">Characteristics</div>
+    <div class="req-desc">Explore services, read/write/subscribe, auto-format known sensors</div>
+  </div>
+  <div class="req-card">
+    <div class="req-icon">📊</div>
+    <div class="req-title">Real-time Chart</div>
+    <div class="req-desc">Live graph of sensor values, multi-series, CSV export</div>
+  </div>
+  <div class="req-card">
+    <div class="req-icon">🔍</div>
+    <div class="req-title">Packet Analyzer</div>
+    <div class="req-desc">Wireshark-style view with hex dump and filters</div>
+  </div>
+  <div class="req-card">
+    <div class="req-icon">🛠️</div>
+    <div class="req-title">Debug Tools</div>
+    <div class="req-desc">Timeline, latency reports, snapshot export, log search</div>
+  </div>
+  <div class="req-card">
+    <div class="req-icon">📻</div>
+    <div class="req-title">SDR Spectrum</div>
+    <div class="req-desc">See WiFi and BLE radio waves on a waterfall display</div>
+  </div>
+</div>
+
+<!-- ════════ LINKS ════════ -->
+<div class="nav-links">
+  <a href="howto.html">How-To Guides</a>
+  <a href="help.html">FAQ &amp; Troubleshooting</a>
+  <a href="../frontend/index.html">Open Dashboard</a>
+</div>
+
+<div class="footer">BLE Dashboard v1.0 — Workshop-DIY — abourdim</div>
+
+</body>
+</html>

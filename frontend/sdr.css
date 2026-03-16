@@ -1,0 +1,101 @@
+/* ═══════════════════════════════════════════
+   sdr.css  — SDR Spectrum Analyzer styles
+   ═══════════════════════════════════════════ */
+
+/* Section accent — indigo */
+details.section-sdr > summary { border-left: 3px solid #818cf8 !important; }
+.card.section-sdr {
+  border-left: 3px solid #818cf8 !important;
+  background: linear-gradient(90deg, rgba(129,140,248,.06), transparent 40%), var(--panel);
+}
+details.section-sdr > summary .icon { color: #818cf8; }
+.light-theme .card.section-sdr { background: linear-gradient(90deg, rgba(129,140,248,.08), transparent 40%), var(--panel); }
+
+/* ── Controls row ── */
+.sdr-controls {
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+}
+
+/* ── Sub-sections ── */
+.sdr-subsection {
+  padding:10px 0; border-bottom:1px solid var(--border,rgba(255,255,255,.06));
+}
+.sdr-subsection:last-child { border-bottom:none; }
+
+.sdr-sub-title {
+  font-family:'Orbitron',monospace; font-size:.72rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em;
+  color:#818cf8; margin-bottom:8px; padding:0 4px;
+}
+
+/* ── Waterfall canvas ── */
+.sdr-waterfall-wrap {
+  position:relative; width:100%; height:200px;
+  background:var(--bg-deep,#06071a); border-radius:8px;
+  overflow:hidden; border:1px solid var(--border,rgba(255,255,255,.08));
+}
+.sdr-waterfall-wrap canvas {
+  width:100%; height:100%; display:block;
+  image-rendering:pixelated;
+}
+
+/* ── Frequency axis ── */
+.sdr-freq-axis {
+  display:flex; justify-content:space-between; padding:2px 4px;
+  font-family:'Orbitron',monospace; font-size:.55rem; color:var(--text-dim,#556);
+}
+
+/* ── Color legend ── */
+.sdr-legend {
+  display:flex; align-items:center; gap:6px; padding:4px 4px 0;
+  font-size:.55rem; color:var(--text-dim,#7a8aaa);
+}
+.sdr-legend-bar {
+  width:120px; height:8px; border-radius:4px;
+  background: linear-gradient(90deg, #0d0887, #7e03a8, #cc4778, #f0723e, #f0f921);
+}
+.sdr-legend-label { font-family:'Orbitron',monospace; }
+
+/* ── Channel bar chart ── */
+.sdr-channels-wrap {
+  position:relative; width:100%; height:150px;
+  background:var(--bg-deep,#06071a); border-radius:8px;
+  overflow:hidden; border:1px solid var(--border,rgba(255,255,255,.08));
+}
+.sdr-channels-wrap canvas {
+  width:100%; height:100%; display:block;
+}
+
+/* ── Overlay chart ── */
+.sdr-overlay-wrap {
+  position:relative; width:100%; height:200px;
+  background:var(--bg-deep,#06071a); border-radius:8px;
+  overflow:hidden; border:1px solid var(--border,rgba(255,255,255,.08));
+}
+.sdr-overlay-wrap canvas {
+  width:100%; height:100%; display:block;
+}
+
+/* ── Status indicator ── */
+.sdr-status {
+  font-family:'Orbitron',monospace; font-size:.6rem;
+  padding:2px 8px; border-radius:4px;
+}
+.sdr-status.active {
+  background:rgba(129,140,248,.15); color:#818cf8;
+  animation: sdrPulse 1.5s ease-in-out infinite;
+}
+.sdr-status.idle { color:var(--text-dim,#556); }
+
+@keyframes sdrPulse {
+  0%,100% { opacity:1; }
+  50% { opacity:.4; }
+}
+
+/* ── Responsive ── */
+@media (max-width:640px) {
+  .sdr-waterfall-wrap { height:140px; }
+  .sdr-channels-wrap { height:110px; }
+  .sdr-overlay-wrap { height:140px; }
+  .sdr-controls { flex-direction:column; align-items:stretch; }
+}
