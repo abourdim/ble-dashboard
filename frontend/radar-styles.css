@@ -4,14 +4,17 @@
 
 /* ── Style selector ── */
 .radar-style-bar {
-  display:flex; gap:4px; justify-content:center; padding:6px 0;
+  display:flex; gap:4px; justify-content:center; align-items:center;
+  padding:4px 0; flex-shrink:0; height:auto; max-height:30px;
 }
 .radar-style-btn {
-  font-size:.6rem; padding:3px 8px; border-radius:4px; cursor:pointer;
+  font-size:.55rem; padding:3px 8px; border-radius:4px; cursor:pointer;
   border:1px solid var(--border,rgba(255,255,255,.1));
   background:rgba(255,255,255,.04); color:var(--text-dim,#7a8aaa);
   font-family:'Orbitron',monospace; font-weight:600; text-transform:uppercase;
   letter-spacing:.04em; transition:all .2s;
+  line-height:1.2; flex:none; height:22px;
+  display:inline-flex; align-items:center;
 }
 .radar-style-btn:hover { border-color:var(--accent,#00aaff); color:var(--text,#e0e8ff); }
 .radar-style-btn.active {

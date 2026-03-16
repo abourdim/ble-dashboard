@@ -67,7 +67,7 @@ details.section-multi > summary .icon { color: #fb923c; }
    RADAR VIEW
    ═══════════════════════════════════════════ */
 
-.ble-radar-view { padding:12px 0; display:flex; justify-content:center; }
+.ble-radar-view { padding:12px 0; display:flex; flex-direction:column; align-items:center; }
 
 .ble-radar-container { position:relative; width:100%; max-width:420px; aspect-ratio:1; }
 
