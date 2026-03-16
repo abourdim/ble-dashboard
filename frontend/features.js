@@ -1398,14 +1398,21 @@ function _escH(s) { const d = document.createElement('div'); d.textContent = s |
    HOOKS — intercept scan results to feed all features
    ═══════════════════════════════════ */
 function _initFeatureHooks() {
-  // Hook into badges.js _handleBadgeEvent by wrapping it
-  if (typeof _handleBadgeEvent === 'function') {
-    const origHandler = _handleBadgeEvent;
-    window._handleBadgeEvent = function(msg) {
-      origHandler(msg);
-      _handleFeatureEvent(msg);
-    };
-  }
+  // Hook directly into WebSocket messages (badges.js uses local ref so monkey-patch won't work)
+  const wsCheck = setInterval(() => {
+    if (typeof ble !== 'undefined' && ble.ws && ble.ws.onmessage) {
+      const origHandler = ble.ws.onmessage;
+      ble.ws.onmessage = function(ev) {
+        try {
+          const msg = JSON.parse(ev.data);
+          _handleFeatureEvent(msg);
+        } catch {}
+        return origHandler.call(this, ev);
+      };
+      clearInterval(wsCheck);
+    }
+  }, 500);
+  setTimeout(() => clearInterval(wsCheck), 10000);
 
   // Also hook bleScan for mission counting
   const origScan = window.bleScan;

@@ -2735,4 +2735,8 @@ function simulateDevices() {
   }
   log('🎲 Simulated ' + count + ' demo devices.', 'info');
   renderDeviceList(devices);
+  // Trigger feature hooks so Hacker Lab features work in demo mode
+  if (typeof _handleFeatureEvent === 'function') {
+    _handleFeatureEvent({ type: 'scan_result', devices: devices });
+  }
 }
