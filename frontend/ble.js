@@ -712,12 +712,14 @@ function wsConnect() {
     ble.ws = new WebSocket(url);
     ble.ws.onopen = () => {
       ble.wsConnected=true; _wsRetries=0;
+      if (typeof setStatus === 'function') setStatus(true);
       _timelineEvent('WS Connected', url, 'success');
       log('🔌 Backend connected ('+url+')','success');
       wsSend({type:'hello',version:'1.0'});
     };
     ble.ws.onclose = () => {
       ble.wsConnected=false;
+      if (typeof setStatus === 'function') setStatus(false);
       _wsRetries++;
       _timelineEvent('WS Disconnected', 'retry #'+_wsRetries, 'error');
       // After 2 failures on current host, try fallback ports
@@ -745,13 +747,14 @@ function _wsConnectTo(url) {
     ble.ws = new WebSocket(url);
     ble.ws.onopen = () => {
       ble.wsConnected=true; _wsRetries=0;
+      if (typeof setStatus === 'function') setStatus(true);
       log('🔌 Backend connected ('+url+')','success');
       // Update the backendURL field so subsequent reconnects use this URL
       const field = document.getElementById('backendURL');
       if (field) field.value = url;
       wsSend({type:'hello',version:'1.0'});
     };
-    ble.ws.onclose = () => { ble.wsConnected=false; _wsRetries++; setTimeout(wsConnect, 3000); };
+    ble.ws.onclose = () => { ble.wsConnected=false; if (typeof setStatus === 'function') setStatus(false); _wsRetries++; setTimeout(wsConnect, 3000); };
     ble.ws.onerror = () => {};
     ble.ws.onmessage = (ev) => wsHandle(JSON.parse(ev.data));
   } catch(e) { setTimeout(wsConnect, 3000); }
